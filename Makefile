@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c11 -O2 -I$(INCLUDE_DIR)
+CFLAGS = -Wall -std=c11 -O2 -I $(INCLUDE_DIR)
 LDFLAGS = -lglfw3dll -lm
 
 LIB_DIR = lib
@@ -16,7 +16,7 @@ TARGET = $(BIN_DIR)/app
 all: $(TARGET)
 
 $(TARGET): $(OBJ) | $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $@ $^ -L$(LIB_DIR) $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $^ -L $(LIB_DIR) $(LDFLAGS)
 
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.c | $(BIN_DIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
