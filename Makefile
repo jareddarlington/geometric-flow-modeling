@@ -1,25 +1,31 @@
-# Variables
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c11
+CFLAGS = -Wall -Wextra -std=c11 -O2 -I$(INCLUDE_DIR)
+LDFLAGS = -lglfw3dll -lm
+
+LIB_DIR = lib
+INCLUDE_DIR = include
+
 SRC_DIR = src
 BIN_DIR = bin
+
+SRC = $(wildcard $(SRC_DIR)/*.c)
+OBJ = $(SRC:$(SRC_DIR)/%.c=$(BIN_DIR)/%.o)
+
 TARGET = $(BIN_DIR)/app
 
-# Source files
-SRCS = $(wildcard $(SRC_DIR)/*.c)
-OBJS = $(SRCS:$(SRC_DIR)/%.c=$(BIN_DIR)/%.o)
-
-# Rules
 all: $(TARGET)
 
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
+$(TARGET): $(OBJ) | $(BIN_DIR)
+	$(CC) $(CFLAGS) -o $@ $^ -L$(LIB_DIR) $(LDFLAGS)
 
-$(BIN_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(BIN_DIR)
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.c | $(BIN_DIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-clean:
-	rm -rf $(BIN_DIR)/*.o $(TARGET)
+$(BIN_DIR):
+	mkdir -p $(BIN_DIR)
 
-.PHONY: all clean
+debug: CFLAGS += -DDEBUG -O0 -g
+debug: clean $(TARGET)
+
+clean:
+	rm -rf $(BIN_DIR) $(TARGET)
