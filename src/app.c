@@ -14,9 +14,9 @@ void error_callback(int error, const char *description);
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
 // Settings
-const unsigned int DEFAULT_WIDTH = 800;
-const unsigned int DEFAULT_HEIGHT = 600;
-const char *TITLE = "Geometric Flow Modeling";
+static const unsigned int DEFAULT_WIDTH = 800;
+static const unsigned int DEFAULT_HEIGHT = 600;
+static const char *TITLE = "Geometric Flow Modeling";
 
 typedef struct Vertex
 {
