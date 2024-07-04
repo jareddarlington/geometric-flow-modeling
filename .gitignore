@@ -1,0 +1,8 @@
+# vscode
+.vscode
+
+# macOS
+.DS_Store
+
+# executables
+*.exe
