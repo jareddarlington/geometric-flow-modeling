@@ -5,6 +5,7 @@
 
 #include "linmath.h"
 #include "shader_utils.h"
+#include "model.h"
 
 #include <stdlib.h>
 #include <stddef.h>
