@@ -1,10 +1,13 @@
+// OpenGL Version
 #version 460 core
 
+// Input
 layout(location = 0) in vec3 aPos;
 
-out vec3 ourColor;
+// Output
+out vec3 color;
 
 void main() {
     gl_Position = vec4(aPos, 1.0);
-    ourColor = vec3(1.0, 0.5, 0.2);
+    color = vec3(1.0, 0.0, 0.0);
 }

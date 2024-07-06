@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include "linmath.h"
-#include "shader_utils.h"
+#include "shader.h"
 #include "model.h"
 
 #include <stdlib.h>
@@ -62,43 +62,51 @@ int main(void)
     // Set buffer swap timing
     glfwSwapInterval(1);
 
-    GLuint shaderProgram = createShaderProgram("./shaders/vertex_shader.glsl", "./shaders/fragment_shader.glsl");
+    GLuint shaderProgram = createShaderProgram("./shaders/vertex.glsl", "./shaders/fragment.glsl");
     if (!shaderProgram)
     {
         return -1;
     }
 
-    float vertices[] = {
-        -1.0f, -1.0f, 0.0f, // Vertex 1 position (x, y, z)
-        1.0f, -1.0f, 0.0f,  // Vertex 2 position (x, y, z)
-        0.0f, 1.0f, 0.0f    // Vertex 3 position (x, y, z)
+    static const GLfloat vertices[] = {
+        -1.0f, -1.0f, 0.0f, // bottom left
+        1.0f, -1.0f, 0.0f,  // bottom right
+        0.0f, 1.0f, 0.0f    // top middle
     };
 
-    GLuint VBO, VAO;
+    // Create Vertex Array Object
+    GLuint VAO;
     glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-
     glBindVertexArray(VAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // Create Vertex Buffer Object
+    GLuint VBO;
+    glGenBuffers(1, &VBO);                                                     // gen buffer
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);                                        // bind buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // allocate memory and upload vertex data to GPU
 
+    // Position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0); // unbind VAO for cleanup
 
     // Loop until the user closes the window
     while (!glfwWindowShouldClose(window))
     {
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear screen
 
-        glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glUseProgram(shaderProgram);      // set shader program
+        glBindVertexArray(VAO);           // bind VAO
+        glDrawArrays(GL_TRIANGLES, 0, 3); // draw object
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        glBindVertexArray(0); // unbind VAO for cleanup
+
+        glfwSwapBuffers(window); // swap front and back buffers
+        glfwPollEvents();        // handles user input and window events
     }
 
+    // Cleanup
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteProgram(shaderProgram);
