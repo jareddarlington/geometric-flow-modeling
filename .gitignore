@@ -4,6 +4,6 @@
 # macOS
 .DS_Store
 
-# executables
+# binaries
 *.exe
 *.o
