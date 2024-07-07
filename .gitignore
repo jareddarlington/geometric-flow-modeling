@@ -6,3 +6,4 @@
 
 # executables
 *.exe
+*.o
