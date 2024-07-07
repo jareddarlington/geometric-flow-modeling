@@ -3,9 +3,9 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include "linmath.h"
 #include "shader.h"
 #include "model.h"
+#include <cglm/cglm.h>
 
 #include <stdlib.h>
 #include <stddef.h>
