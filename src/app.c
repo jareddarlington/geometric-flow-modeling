@@ -68,6 +68,7 @@ int main(void)
     GLuint shaderProgram = createShaderProgram("./shaders/vertex.glsl", "./shaders/fragment.glsl");
     if (!shaderProgram)
     {
+        // TODO: Add error
         return -1;
     }
 
