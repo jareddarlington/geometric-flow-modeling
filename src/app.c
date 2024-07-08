@@ -59,6 +59,9 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
+    // Set background color
+    glClearColor(0.1686f, 0.1608f, 0.1686f, 1.0f);
+
     // Set buffer swap timing
     glfwSwapInterval(1);
 
@@ -73,6 +76,21 @@ int main(void)
         1.0f, -1.0f, 0.0f,  // bottom right
         0.0f, 1.0f, 0.0f    // top middle
     };
+
+    GLuint mvpUniform = glGetUniformLocation(shaderProgram, "MVP");
+    mat4 mvp;        // mvp matrix
+    mat4 projection; // projection matrix
+    mat4 view;       // camera matrix
+    mat4 model;      // model matrix
+
+    glm_perspective(glm_rad(45.0f), 2.0f / 3.0f, 0.1f, 100.0f, projection); // fov y, aspect ratio, near value, far value, destination
+    glm_lookat((vec3){4.0f, 3.0f, 3.0f},                                    // camera position (world space)
+               (vec3){0.0f, 0.0f, 0.0f},                                    // camera looks here (world space)
+               (vec3){0.0f, 1.0f, 0.0f},                                    // head is up ({0, -1, 0} to look upside down)
+               view);                                                       // destination
+    glm_mat4_identity(model);                                               // identity matrix for model
+    glm_mat4_mul(projection, view, mvp);                                    // mvp = projection * view
+    glm_mat4_mul(mvp, model, mvp);                                          // mvp = mvp * model
 
     // Create Vertex Array Object
     GLuint VAO;
@@ -96,7 +114,10 @@ int main(void)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear screen
 
-        glUseProgram(shaderProgram);      // set shader program
+        glUseProgram(shaderProgram); // set shader program
+
+        glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, &mvp[0][0]); // send transformation to the currently bound shader
+
         glBindVertexArray(VAO);           // bind VAO
         glDrawArrays(GL_TRIANGLES, 0, 3); // draw object
 
