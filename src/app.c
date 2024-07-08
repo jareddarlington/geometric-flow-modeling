@@ -4,9 +4,9 @@
 #include <GLFW/glfw3.h>
 
 #include "shader.h"
-#include "model.h"
-#include <cglm/cglm.h>
+#include "camera.h"
 
+#include <cglm/cglm.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -14,6 +14,7 @@
 // Function prototypes
 void error_callback(int error, const char *description);
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
+void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
 // Settings
 static const unsigned int DEFAULT_WIDTH = 800;
@@ -22,6 +23,10 @@ static const char *TITLE = "Geometric Flow Modeling";
 
 int main(void)
 {
+    /*
+     * GLFW Setup
+     */
+
     // Set GLFW error callback
     glfwSetErrorCallback(error_callback);
 
@@ -32,13 +37,13 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-    // Create a windowed mode window and its OpenGL context
+    // Set OpenGL version
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    // Create window
     GLFWwindow *window = glfwCreateWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, TITLE, NULL, NULL);
-
     if (!window)
     {
         glfwTerminate();
@@ -46,37 +51,34 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-    // Set close on escape
-    glfwSetKeyCallback(window, key_callback);
+    // GLFW settings
+    glfwMakeContextCurrent(window);                                    // make the window's context current
+    glfwSetKeyCallback(window, key_callback);                          // set close on escape
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // callback function for frame resizing
+    glfwSwapInterval(1);                                               // set buffer swap timing
 
-    // Make the window's context current
-    glfwMakeContextCurrent(window);
+    /*
+     * OpenGL / Glad Setup
+     */
 
-    // Load OpenGL functions using glad
+    // Load OpenGL functions using Glad
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         fprintf(stderr, "Failed to initialize OpenGL context\n");
         exit(EXIT_FAILURE);
     }
 
-    // Setup
+    // OpenGL settings
     glClearColor(0.1686f, 0.1608f, 0.1686f, 1.0f); // set background color
-    glfwSwapInterval(1);                           // set buffer swap timing
-    glEnable(GL_DEPTH_TEST);                       // enable depth test
+    glEnable(GL_DEPTH_TEST);                       // enable depth test (z-buffer)
     glDepthFunc(GL_LESS);                          // use fragment closer to the camera
 
-    GLuint shaderProgram = createShaderProgram("./shaders/vertex.glsl", "./shaders/fragment.glsl");
-    if (!shaderProgram)
-    {
-        // TODO: Add error message
-        return -1;
-    }
+    /*
+     * Initialization
+     */
 
-    // static const GLfloat vertices[] = {
-    //     -1.0f, -1.0f, 0.0f, // bottom left
-    //     1.0f, -1.0f, 0.0f,  // bottom right
-    //     0.0f, 1.0f, 0.0f    // top middle
-    // };
+    // Create shader
+    GLuint shaderProgram = createShaderProgram("./shaders/vertex.glsl", "./shaders/fragment.glsl");
 
     static const GLfloat vertices[] = {
         -1.0f, -1.0f, -1.0f,
@@ -115,7 +117,6 @@ int main(void)
         1.0f, 1.0f, 1.0f,
         -1.0f, 1.0f, 1.0f,
         1.0f, -1.0f, 1.0f};
-
     static const GLfloat colors[] = {
         0.583f, 0.771f, 0.014f,
         0.609f, 0.115f, 0.436f,
@@ -234,4 +235,9 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+}
+
+void framebuffer_size_callback(GLFWwindow *window, int width, int height)
+{
+    glViewport(0, 0, width, height); // set viewport to new window dimensions
 }

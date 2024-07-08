@@ -1,5 +1,5 @@
-#ifndef SHADER_UTILS_H
-#define SHADER_UTILS_H
+#ifndef SHADER_H
+#define SHADER_H
 
 #include <glad/glad.h>
 
@@ -8,4 +8,4 @@ char *readShaderSource(const char *shaderFile);
 GLuint compileShader(const char *shaderSource, GLenum shaderType);
 GLuint createShaderProgram(const char *vertexFilePath, const char *fragmentFilePath);
 
-#endif // SHADER_UTILS_H
+#endif // SHADER_H
