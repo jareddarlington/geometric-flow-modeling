@@ -8,15 +8,13 @@
 float speed = 3.0f; // 3 units per second
 float mouseSpeed = 0.005f;
 
-mat4 mvp; // mvp matrix
-
 Camera *createCamera(vec3 position)
 {
     Camera *camera = malloc(sizeof(Camera));
     glm_vec3_copy(camera->position, position);
     camera->yaw = 0;
     camera->pitch = 0;
-    camera->fov = 60;
+    camera->fov = 90;
     updateVectors(camera);
     return camera;
 };
@@ -39,9 +37,16 @@ void updateVectors(Camera *camera)
     glm_vec3_cross(camera->right, camera->front, camera->up);
 }
 
-mat4 *computeMVP(GLFWwindow *window, Camera *camera)
+void updateCamera(GLFWwindow *window, Camera *camera, mat4 mvp)
 {
-    float deltaTime = glfwGetTime(); // get time since last frame // TODO: Fix this?
+    static double lastTime = 0.0;
+
+    if (lastTime == 0.0)
+        lastTime = glfwGetTime();
+
+    // Compute time difference between current and last frame
+    double currentTime = glfwGetTime();
+    float deltaTime = (float)(currentTime - lastTime);
 
     // Get mouse position
     double xpos, ypos;
@@ -50,12 +55,12 @@ mat4 *computeMVP(GLFWwindow *window, Camera *camera)
     // Reset mouse position
     int winWidth;
     int winHeight;
-    glfwGetWindowSize(window, &winWidth, &winHeight); // TODO: FIX?
+    glfwGetWindowSize(window, &winWidth, &winHeight);
     glfwSetCursorPos(window, winWidth / 2, winHeight / 2);
 
     // Compute new orientation
     camera->yaw += mouseSpeed * (float)((winWidth / 2) - xpos);
-    camera->pitch += mouseSpeed * (float)((winHeight / 2) - xpos);
+    camera->pitch += mouseSpeed * (float)((winHeight / 2) - ypos);
 
     updateVectors(camera);
 
@@ -88,6 +93,7 @@ mat4 *computeMVP(GLFWwindow *window, Camera *camera)
     mat4 projection; // projection matrix
     mat4 view;       // camera matrix
     mat4 model;      // model matrix
+    mat4 tempMVP;
 
     vec3 posDestTemp;
     glm_vec3_add(camera->position, camera->front, posDestTemp);
@@ -98,8 +104,10 @@ mat4 *computeMVP(GLFWwindow *window, Camera *camera)
                camera->up,                                                        // head is up ({0, -1, 0} to look upside down)
                view);                                                             // destination
     glm_mat4_identity(model);                                                     // identity matrix for model
-    glm_mat4_mul(projection, view, mvp);                                          // mvp = projection * view
-    glm_mat4_mul(mvp, model, mvp);                                                // mvp = mvp * model
+    glm_mat4_mul(projection, view, tempMVP);                                      // mvp = projection * view
+    glm_mat4_mul(tempMVP, model, tempMVP);                                        // mvp = mvp * model
 
-    return &mvp;
+    glm_mat4_copy(tempMVP, mvp);
+
+    lastTime = currentTime;
 }

@@ -156,7 +156,7 @@ int main(void)
         0.982f, 0.099f, 0.879f};
 
     GLuint mvpUniform = glGetUniformLocation(shaderProgram, "MVP");
-    // mat4 mvp;        // mvp matrix
+    mat4 mvp; // mvp matrix
     // mat4 projection; // projection matrix
     // mat4 view;       // camera matrix
     // mat4 model;      // model matrix
@@ -197,12 +197,12 @@ int main(void)
 
     glBindVertexArray(0); // unbind VAO for cleanup
 
+    vec3 initPos = {0.0f, 0.0f, 5.0f};
+    Camera *camera = createCamera(initPos);
+
     /*
      * Rendering Loop
      */
-
-    vec3 initPos = {0.0f, 0.0f, 0.0f};
-    Camera *camera = createCamera(initPos);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -210,7 +210,7 @@ int main(void)
 
         glUseProgram(shaderProgram); // set shader program
 
-        mat4 *mvp = computeMVP(window, camera); // compute new mvp
+        updateCamera(window, camera, mvp); // compute new mvp
 
         glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, &mvp[0][0]); // send mvp transformation to the currently bound shader
 

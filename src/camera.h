@@ -1,5 +1,3 @@
-
-
 #ifndef CAMERA_H
 #define CAMERA_H
 
@@ -22,6 +20,6 @@ typedef struct
 // Functions
 Camera *createCamera(vec3 position);
 void updateVectors(Camera *camera);
-mat4 *computeMVP(GLFWwindow *window, Camera *camera);
+void updateCamera(GLFWwindow *window, Camera *camera, mat4 mvp);
 
 #endif
