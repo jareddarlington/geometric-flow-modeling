@@ -11,6 +11,8 @@
 #include <stddef.h>
 #include <stdio.h>
 
+// TODO: Look more into computing geometric flows on discrete surfaces
+
 // Function prototypes
 void error_callback(int error, const char *description);
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
