@@ -156,19 +156,19 @@ int main(void)
         0.982f, 0.099f, 0.879f};
 
     GLuint mvpUniform = glGetUniformLocation(shaderProgram, "MVP");
-    mat4 mvp;        // mvp matrix
-    mat4 projection; // projection matrix
-    mat4 view;       // camera matrix
-    mat4 model;      // model matrix
+    // mat4 mvp;        // mvp matrix
+    // mat4 projection; // projection matrix
+    // mat4 view;       // camera matrix
+    // mat4 model;      // model matrix
 
-    glm_perspective(glm_rad(60.0f), 4.0f / 3.0f, 0.1f, 100.0f, projection); // fov y, aspect ratio, near value, far value, destination
-    glm_lookat((vec3){4.0f, 3.0f, -3.0f},                                   // camera position (world space)
-               (vec3){0.0f, 0.0f, 0.0f},                                    // camera looks here (world space)
-               (vec3){0.0f, 1.0f, 0.0f},                                    // head is up ({0, -1, 0} to look upside down)
-               view);                                                       // destination
-    glm_mat4_identity(model);                                               // identity matrix for model
-    glm_mat4_mul(projection, view, mvp);                                    // mvp = projection * view
-    glm_mat4_mul(mvp, model, mvp);                                          // mvp = mvp * model
+    // glm_perspective(glm_rad(60.0f), 4.0f / 3.0f, 0.1f, 100.0f, projection); // fov y, aspect ratio, near value, far value, destination
+    // glm_lookat((vec3){4.0f, 3.0f, -3.0f},                                   // camera position (world space)
+    //            (vec3){0.0f, 0.0f, 0.0f},                                    // camera looks here (world space)
+    //            (vec3){0.0f, 1.0f, 0.0f},                                    // head is up ({0, -1, 0} to look upside down)
+    //            view);                                                       // destination
+    // glm_mat4_identity(model);                                               // identity matrix for model
+    // glm_mat4_mul(projection, view, mvp);                                    // mvp = projection * view
+    // glm_mat4_mul(mvp, model, mvp);                                          // mvp = mvp * model
 
     // Vertex Array Object
     GLuint VAO;
@@ -197,12 +197,20 @@ int main(void)
 
     glBindVertexArray(0); // unbind VAO for cleanup
 
-    // Loop until user closes window
+    /*
+     * Rendering Loop
+     */
+
+    vec3 initPos = {0.0f, 0.0f, 0.0f};
+    Camera *camera = createCamera(initPos);
+
     while (!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear screen
 
         glUseProgram(shaderProgram); // set shader program
+
+        mat4 *mvp = computeMVP(window, camera); // compute new mvp
 
         glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, &mvp[0][0]); // send mvp transformation to the currently bound shader
 
@@ -219,8 +227,6 @@ int main(void)
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteProgram(shaderProgram);
-
-    // Terminate GLFW
     glfwDestroyWindow(window);
     glfwTerminate();
     exit(EXIT_SUCCESS);

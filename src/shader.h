@@ -3,9 +3,9 @@
 
 #include <glad/glad.h>
 
-// Function declarations
+// Functions
 char *readShaderSource(const char *shaderFile);
 GLuint compileShader(const char *shaderSource, GLenum shaderType);
 GLuint createShaderProgram(const char *vertexFilePath, const char *fragmentFilePath);
 
-#endif // SHADER_H
+#endif
