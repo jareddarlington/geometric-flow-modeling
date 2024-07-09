@@ -14,6 +14,7 @@
 #include <stdio.h>
 
 // TODO: Look more into computing geometric flows on discrete surfaces
+// TODO: Spawn object not on top of player (or vice versa idk)
 
 /*
  * Function Prototypes
@@ -83,6 +84,7 @@ int main(void)
     glClearColor(0.1686f, 0.1608f, 0.1686f, 1.0f); // set background color
     glEnable(GL_DEPTH_TEST);                       // enable depth test (z-buffer)
     glDepthFunc(GL_LESS);                          // use fragment closer to the camera
+    glEnable(GL_CULL_FACE);                        // enable face culling (doesn't render polygons that aren't visible)
 
     /*
      * Initialization
