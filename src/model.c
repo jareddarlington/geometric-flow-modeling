@@ -63,7 +63,7 @@ Mesh *createMesh(const char *filename)
     glBindVertexArray(0);
 
     // uncomment this call to draw in wireframe polygons.
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     return mesh;
 }
