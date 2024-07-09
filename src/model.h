@@ -31,11 +31,8 @@ typedef struct
 } Vertex;
 
 Model *createModel(Mesh *mesh);
-
 void destroyModel(Model *model);
-
 Mesh *createMesh(const char *filename, bool instanced);
-
 void destroyMesh(Mesh *mesh);
 
 #endif

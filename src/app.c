@@ -86,7 +86,7 @@ int main(void)
     glClearColor(0.1686f, 0.1608f, 0.1686f, 1.0f); // set background colors
     glEnable(GL_DEPTH_TEST);                       // enable depth test (z-buffer)
     glDepthFunc(GL_LESS);                          // use fragment closer to the camera
-    glEnable(GL_CULL_FACE);                        // enable face culling (doesn't render polygons that aren't visible)
+    // glEnable(GL_CULL_FACE);                        // enable face culling (doesn't render polygons that aren't visible) // TODO: Enable later
 
     /*
      * Initialization

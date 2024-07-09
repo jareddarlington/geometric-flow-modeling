@@ -1,5 +1,7 @@
 #include "utils.h"
 
+#include <stdlib.h>
+
 void init(DynamicArray *dynArray, size_t initCap)
 {
     dynArray->array = (float *)malloc(initCap * sizeof(float)); // allocate init space
