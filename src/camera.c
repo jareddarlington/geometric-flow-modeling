@@ -6,7 +6,6 @@
 #include <cglm/cglm.h>
 
 // TODO: Restrict pitch / verticle angle so that you can’t go upside-down
-
 // TODO: Create a seperate camera that rotates around the object ( position = ObjectCenter + ( radius * cos(time), height, radius * sin(time) ) ); bind the radius/height/time to the keyboard/mouse, or whatever
 
 float speed = 5.0f;        // movement speed (units per second)

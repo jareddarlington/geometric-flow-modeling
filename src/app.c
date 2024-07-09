@@ -6,6 +6,7 @@
 
 #include "shader.h"
 #include "camera.h"
+#include "model.h"
 
 #include <cglm/cglm.h>
 
@@ -17,20 +18,20 @@
 // TODO: Spawn object not on top of player (or vice versa idk)
 
 /*
+ * Constants
+ */
+
+#define TITLE "Geometric Flow Modeling"
+#define DEFAULT_WIDTH 800
+#define DEFAULT_HEIGHT 600
+
+/*
  * Function Prototypes
  */
 
 void error_callback(int error, const char *description);
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-
-/*
- * Constants
- */
-
-static const unsigned int DEFAULT_WIDTH = 800;
-static const unsigned int DEFAULT_HEIGHT = 600;
-static const char *TITLE = "Geometric Flow Modeling";
 
 int main(void)
 {
@@ -53,6 +54,7 @@ int main(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);                 // 4.x major version
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);                 // x.6 minor version
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // core OpenGL profile
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);           // fixes macOS issues
 
     // Create window
     GLFWwindow *window = glfwCreateWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, TITLE, NULL, NULL);
@@ -81,7 +83,7 @@ int main(void)
     }
 
     // OpenGL settings
-    glClearColor(0.1686f, 0.1608f, 0.1686f, 1.0f); // set background color
+    glClearColor(0.1686f, 0.1608f, 0.1686f, 1.0f); // set background colors
     glEnable(GL_DEPTH_TEST);                       // enable depth test (z-buffer)
     glDepthFunc(GL_LESS);                          // use fragment closer to the camera
     glEnable(GL_CULL_FACE);                        // enable face culling (doesn't render polygons that aren't visible)
