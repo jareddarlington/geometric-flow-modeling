@@ -6,6 +6,8 @@
 
 #include <cglm/cglm.h>
 
+#include "utils.h"
+
 typedef struct
 {
     int vertCount;   // number of vertices
@@ -32,7 +34,9 @@ typedef struct
 
 Model *createModel(Mesh *mesh);
 void destroyModel(Model *model);
-Mesh *createMesh(const char *filename, bool instanced);
+Mesh *createMesh(const char *filename);
 void destroyMesh(Mesh *mesh);
+DynamicArray *loadOBJ(const char *filename);
+void processVertex(DynamicArray *vertices, char *vertexData[3], Vertex v[], Vertex vt[], Vertex vn[]);
 
 #endif
