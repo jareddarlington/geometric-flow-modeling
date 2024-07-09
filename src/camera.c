@@ -5,8 +5,8 @@
 
 #include <cglm/cglm.h>
 
-float speed = 3.0f; // 3 units per second
-float mouseSpeed = 0.005f;
+float speed = 5.0f;        // movement speed (units per second)
+float mouseSpeed = 0.005f; // turn speed
 
 Camera *createCamera(vec3 position)
 {
@@ -39,7 +39,7 @@ void updateVectors(Camera *camera)
 
 void updateCamera(GLFWwindow *window, Camera *camera, mat4 mvp)
 {
-    static double lastTime = 0.0;
+    static double lastTime = 0.0; // init time (first function call)
 
     if (lastTime == 0.0)
         lastTime = glfwGetTime();
@@ -62,7 +62,7 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 mvp)
     camera->yaw += mouseSpeed * (float)((winWidth / 2) - xpos);
     camera->pitch += mouseSpeed * (float)((winHeight / 2) - ypos);
 
-    updateVectors(camera);
+    updateVectors(camera); // compute front, right, and up
 
     // WASD movement
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // forward
@@ -93,21 +93,21 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 mvp)
     mat4 projection; // projection matrix
     mat4 view;       // camera matrix
     mat4 model;      // model matrix
-    mat4 tempMVP;
+    mat4 tempMVP;    // temporary MVP
 
     vec3 posDestTemp;
     glm_vec3_add(camera->position, camera->front, posDestTemp);
 
-    glm_perspective(glm_rad(camera->fov), 4.0f / 3.0f, 0.1f, 100.0f, projection); // fov y, aspect ratio, near value, far value, destination
+    glm_perspective(glm_rad(camera->fov), 4.0f / 3.0f, 0.1f, 100.0f, projection); // fov, aspect ratio, near value, far value, destination
     glm_lookat(camera->position,                                                  // camera position (world space)
-               posDestTemp,                                                       // camera looks here (world space)
-               camera->up,                                                        // head is up ({0, -1, 0} to look upside down)
+               posDestTemp,                                                       // direction
+               camera->up,                                                        // up
                view);                                                             // destination
     glm_mat4_identity(model);                                                     // identity matrix for model
-    glm_mat4_mul(projection, view, tempMVP);                                      // mvp = projection * view
-    glm_mat4_mul(tempMVP, model, tempMVP);                                        // mvp = mvp * model
+    glm_mat4_mul(projection, view, tempMVP);                                      // MVP = projection * view
+    glm_mat4_mul(tempMVP, model, tempMVP);                                        // MVP = MVP * model
 
-    glm_mat4_copy(tempMVP, mvp);
+    glm_mat4_copy(tempMVP, mvp); // copy over computed mvp
 
-    lastTime = currentTime;
+    lastTime = currentTime; // update last time taken
 }

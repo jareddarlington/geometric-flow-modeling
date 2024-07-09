@@ -1,5 +1,6 @@
 #define GLAD_GL_IMPLEMENTATION
 #include <glad/glad.h>
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -7,18 +8,25 @@
 #include "camera.h"
 
 #include <cglm/cglm.h>
+
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
 
 // TODO: Look more into computing geometric flows on discrete surfaces
 
-// Function prototypes
+/*
+ * Function Prototypes
+ */
+
 void error_callback(int error, const char *description);
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
-// Settings
+/*
+ * Constants
+ */
+
 static const unsigned int DEFAULT_WIDTH = 800;
 static const unsigned int DEFAULT_HEIGHT = 600;
 static const char *TITLE = "Geometric Flow Modeling";
@@ -40,9 +48,10 @@ int main(void)
     }
 
     // Set OpenGL version
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_SAMPLES, 4);                               // 4x anti-aliasing
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);                 // 4.x major version
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);                 // x.6 minor version
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // core OpenGL profile
 
     // Create window
     GLFWwindow *window = glfwCreateWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, TITLE, NULL, NULL);
@@ -79,9 +88,10 @@ int main(void)
      * Initialization
      */
 
-    // Create shader
+    // Shaders and meshes
     GLuint shaderProgram = createShaderProgram("./shaders/vertex.glsl", "./shaders/fragment.glsl");
 
+    // Attributes (TEMPORARY)
     static const GLfloat vertices[] = {
         -1.0f, -1.0f, -1.0f,
         -1.0f, -1.0f, 1.0f,
@@ -157,21 +167,6 @@ int main(void)
         0.820f, 0.883f, 0.371f,
         0.982f, 0.099f, 0.879f};
 
-    GLuint mvpUniform = glGetUniformLocation(shaderProgram, "MVP");
-    mat4 mvp; // mvp matrix
-    // mat4 projection; // projection matrix
-    // mat4 view;       // camera matrix
-    // mat4 model;      // model matrix
-
-    // glm_perspective(glm_rad(60.0f), 4.0f / 3.0f, 0.1f, 100.0f, projection); // fov y, aspect ratio, near value, far value, destination
-    // glm_lookat((vec3){4.0f, 3.0f, -3.0f},                                   // camera position (world space)
-    //            (vec3){0.0f, 0.0f, 0.0f},                                    // camera looks here (world space)
-    //            (vec3){0.0f, 1.0f, 0.0f},                                    // head is up ({0, -1, 0} to look upside down)
-    //            view);                                                       // destination
-    // glm_mat4_identity(model);                                               // identity matrix for model
-    // glm_mat4_mul(projection, view, mvp);                                    // mvp = projection * view
-    // glm_mat4_mul(mvp, model, mvp);                                          // mvp = mvp * model
-
     // Vertex Array Object
     GLuint VAO;
     glGenVertexArrays(1, &VAO);
@@ -199,7 +194,12 @@ int main(void)
 
     glBindVertexArray(0); // unbind VAO for cleanup
 
-    vec3 initPos = {0.0f, 0.0f, 5.0f};
+    // MVP matrix
+    GLuint mvpUniform = glGetUniformLocation(shaderProgram, "MVP"); // grab handle for MVP uniform
+    mat4 mvp;                                                       // matrix to compute
+
+    // Create camera
+    vec3 initPos = {0.0f, 0.0f, 0.0f};
     Camera *camera = createCamera(initPos);
 
     /*
@@ -212,9 +212,8 @@ int main(void)
 
         glUseProgram(shaderProgram); // set shader program
 
-        updateCamera(window, camera, mvp); // compute new mvp
-
-        glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, &mvp[0][0]); // send mvp transformation to the currently bound shader
+        updateCamera(window, camera, mvp);                       // compute new mvp
+        glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, &mvp[0][0]); // send mvp to the currently bound shader
 
         glBindVertexArray(VAO);            // bind VAO
         glDrawArrays(GL_TRIANGLES, 0, 36); // draw object
@@ -247,5 +246,5 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
-    glViewport(0, 0, width, height); // set viewport to new window dimensions
+    glViewport(0, 0, width, height); // set viewport to new window dimensions on resize
 }
