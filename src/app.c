@@ -21,9 +21,12 @@
  * Constants
  */
 
-#define TITLE "Geometric Flow Modeling"
-#define DEFAULT_WIDTH 800
-#define DEFAULT_HEIGHT 600
+#define TITLE "Geometric Flow Modeling" // window title
+#define DEFAULT_WIDTH 800               // default window width
+#define DEFAULT_HEIGHT 600              // default window height
+#define ANTI_ALIASING 4                 // anti-aliasing quality
+#define MAJOR_VERSION 4                 // OpenGL major version
+#define MINOR_VERION 6                  // OpenGL minor version
 
 /*
  * Function Prototypes
@@ -50,9 +53,9 @@ int main(void)
     }
 
     // Set OpenGL version
-    glfwWindowHint(GLFW_SAMPLES, 4);                               // 4x anti-aliasing
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);                 // 4.x major version
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);                 // x.6 minor version
+    glfwWindowHint(GLFW_SAMPLES, ANTI_ALIASING);                   // anti-aliasing
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, MAJOR_VERSION);     // major version
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, MINOR_VERION);      // minor version
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // core OpenGL profile
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);           // fixes macOS issues
 
@@ -86,7 +89,8 @@ int main(void)
     glClearColor(0.1686f, 0.1608f, 0.1686f, 1.0f); // set background colors
     glEnable(GL_DEPTH_TEST);                       // enable depth test (z-buffer)
     glDepthFunc(GL_LESS);                          // use fragment closer to the camera
-    // glEnable(GL_CULL_FACE);                        // enable face culling (doesn't render polygons that aren't visible) // TODO: Enable later
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);     // enable polygon mode globally
+    // glEnable(GL_CULL_FACE);                        // enable face culling (skips rendering non-visible polygons) // TODO: Enable later
 
     /*
      * Initialization
@@ -103,7 +107,7 @@ int main(void)
 
     // Create camera
     vec3 initPos = {0.0f, 0.0f, 0.0f};
-    Camera *camera = createCamera(initPos);
+    Camera *camera = createCamera(window, initPos);
 
     /*
      * Rendering Loop
@@ -111,52 +115,72 @@ int main(void)
 
     while (!glfwWindowShouldClose(window))
     {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear screen
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUseProgram(shaderProgram); // set shader program
+        // Shaders
+        glUseProgram(shaderProgram);
 
+        // Camera
         updateCamera(window, camera, mvp);                       // compute new mvp
         glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, &mvp[0][0]); // send mvp to the currently bound shader
 
-        // glBindVertexArray(VAO);            // bind VAO
-        // glDrawArrays(GL_TRIANGLES, 0, 36); // draw object
-
-        glBindBuffer(GL_ARRAY_BUFFER, mesh->posVBO);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+        // VAO and VBO
         glBindVertexArray(mesh->VAO);
         glDrawArrays(GL_TRIANGLES, 0, mesh->vertCount);
-        // drawMesh(mesh, shaderProgram, GL_TRIANGLES, containerPosition, rotation, CONTAINER_RADIUS * 2 + VERLET_RADIUS * 3);
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->posVBO);
 
-        // glUseProgram(0);
-
-        glBindVertexArray(0); // unbind VAO for cleanup
+        // Clean up
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+        glUseProgram(0);
 
         glfwSwapBuffers(window); // swap front and back buffers
-        glfwPollEvents();        // handles user input and window events
+        glfwPollEvents();        // handle user input and window events
     }
 
-    // Cleanup
-    // glDeleteVertexArrays(1, &VAO);
-    // glDeleteBuffers(1, &VBO);
+    // Clean up
+    glDeleteVertexArrays(1, &mesh->VAO);
+    glDeleteBuffers(1, &mesh->posVBO);
     glDeleteProgram(shaderProgram);
     glfwDestroyWindow(window);
     glfwTerminate();
     exit(EXIT_SUCCESS);
 }
 
+/**
+ * @brief GLFW error callback function.
+ *
+ * @param error       Error number.
+ * @param description Description of error.
+ */
 void error_callback(int error, const char *description)
 {
     fprintf(stderr, "Error: %s\n", description);
 }
 
+/**
+ * @brief GLFW key callback function.
+ *
+ * @param window   The window that received the event.
+ * @param key      The keyboard key that was pressed or released.
+ * @param scancode The platform-specific scancode of the key.
+ * @param action   The key action.
+ * @param mods     Bit field describing which modifier keys were held down.
+ */
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) // close on escape
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
+/**
+ * @brief GLFW framebuffer size callback; called on frame resize.
+ *
+ * @param window The window whose framebuffer was resized.
+ * @param width  The new width, in pixels, of the framebuffer.
+ * @param heigth The new height, in pixels, of the framebuffer.
+ */
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
-    glViewport(0, 0, width, height); // set viewport to new window dimensions on resize
+    glViewport(0, 0, width, height); // set viewport to new window dimensions
 }

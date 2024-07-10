@@ -5,14 +5,16 @@
 
 #include <cglm/cglm.h>
 
-// TODO: Restrict pitch / verticle angle so that you can’t go upside-down
+#include <stdio.h>
+
 // TODO: Create a seperate camera that rotates around the object ( position = ObjectCenter + ( radius * cos(time), height, radius * sin(time) ) ); bind the radius/height/time to the keyboard/mouse, or whatever
 
-float speed = 5.0f;        // movement speed (units per second)
-float mouseSpeed = 0.005f; // turn speed
-
-Camera *createCamera(vec3 position)
+Camera *createCamera(GLFWwindow *window, vec3 position)
 {
+    int winWidth, winHeight;
+    glfwGetWindowSize(window, &winWidth, &winHeight);
+    glfwSetCursorPos(window, winWidth / 2, winHeight / 2);
+
     Camera *camera = malloc(sizeof(Camera));
     glm_vec3_copy(camera->position, position);
     camera->yaw = 0;
@@ -56,14 +58,17 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 mvp)
     glfwGetCursorPos(window, &xpos, &ypos);
 
     // Reset mouse position
-    int winWidth;
-    int winHeight;
+    int winWidth, winHeight;
     glfwGetWindowSize(window, &winWidth, &winHeight);
     glfwSetCursorPos(window, winWidth / 2, winHeight / 2);
 
     // Compute new orientation
-    camera->yaw += mouseSpeed * (float)((winWidth / 2) - xpos);
-    camera->pitch += mouseSpeed * (float)((winHeight / 2) - ypos);
+    camera->yaw += MOUSE_SPEED * ((winWidth / 2) - xpos);
+    camera->pitch += MOUSE_SPEED * ((winHeight / 2) - ypos);
+    if (camera->pitch > M_PI_2)
+        camera->pitch = M_PI_2;
+    if (camera->pitch < -M_PI_2)
+        camera->pitch = -M_PI_2;
 
     updateVectors(camera); // compute front, right, and up
 
@@ -71,25 +76,25 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 mvp)
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // forward
     {
         vec3 temp;
-        glm_vec3_scale(camera->front, deltaTime * speed, temp);
+        glm_vec3_scale(camera->front, deltaTime * SPEED, temp);
         glm_vec3_add(camera->position, temp, camera->position);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // back
     {
         vec3 temp;
-        glm_vec3_scale(camera->front, deltaTime * speed, temp);
+        glm_vec3_scale(camera->front, deltaTime * SPEED, temp);
         glm_vec3_sub(camera->position, temp, camera->position);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) // right
     {
         vec3 temp;
-        glm_vec3_scale(camera->right, deltaTime * speed, temp);
+        glm_vec3_scale(camera->right, deltaTime * SPEED, temp);
         glm_vec3_add(camera->position, temp, camera->position);
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // left
     {
         vec3 temp;
-        glm_vec3_scale(camera->right, deltaTime * speed, temp);
+        glm_vec3_scale(camera->right, deltaTime * SPEED, temp);
         glm_vec3_sub(camera->position, temp, camera->position);
     }
 

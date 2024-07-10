@@ -1,7 +1,7 @@
 # "make && ./bin/app.exe" to compile and run
 
 CC = gcc
-CFLAGS = -Wall -std=c11 -O2 -I $(INCLUDE_DIR)
+CFLAGS = -Wall -Wextra -std=c11 -O2 -I $(INCLUDE_DIR)
 LDFLAGS = -lglfw3dll -lm
 
 LIB_DIR = lib
