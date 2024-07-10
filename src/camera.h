@@ -24,7 +24,7 @@ typedef struct
 } Camera;
 
 /*
- * Functions
+ * Function Prototypes
  */
 
 /**

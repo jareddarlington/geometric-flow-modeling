@@ -10,18 +10,16 @@
 
 #include <cglm/cglm.h>
 
-#define VERTEX_LIMIT 2000
-#define STRIDE 8
-#define MAX_INSTANCES 20000
+// TODO: fix position, rotation, scale, etc not working / not being used (I think I need to to matrix mul with mvp in app.c) (make graphics file for drawing)
 
 Model *createModel(Mesh *mesh)
 {
-    Model *model = malloc(sizeof(Model));              // allocate model memory
-    model->mesh = mesh;                                // set mesh
-    glm_vec3_copy((vec3){0, 0, -10}, model->position); // set position
-    glm_vec3_copy((vec3){0, 0, 0}, model->rotation);   // set rotation
-    model->scale = 1;                                  // set scale
-    model->renderMethod = GL_TRIANGLES;                // set render method
+    Model *model = malloc(sizeof(Model));                       // allocate model memory
+    model->mesh = mesh;                                         // set mesh
+    glm_vec3_copy((vec3){0.0f, 0.0f, -10.0f}, model->position); // set position
+    glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, model->rotation);   // set rotation
+    model->scale = 0.0001f;                                     // set scale
+    model->renderMethod = GL_TRIANGLES;                         // set render method
     return model;
 }
 
@@ -51,6 +49,7 @@ Mesh *createMesh(const char *filename)
     // Position attribute
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, STRIDE * sizeof(float), (void *)0);
+
     // Normal attribute
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, STRIDE * sizeof(float), (void *)12);
@@ -157,7 +156,7 @@ DynamicArray *loadOBJ(const char *filename)
 
 void processVertex(DynamicArray *vertices, char *vertexData[3], Vertex v[], Vertex vt[], Vertex vn[])
 {
-    int vertex_ptr = atoi(vertexData[0]) - 1;
+    int vertex_ptr = atoi(vertexData[0]) - 1; // ASCII to Integer
     int texture_ptr = atoi(vertexData[1]) - 1;
     int normal_ptr = atoi(vertexData[2]) - 1;
 

@@ -36,6 +36,8 @@ void error_callback(int error, const char *description);
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
+bool camera_on = true;
+
 int main(void)
 {
     /*
@@ -121,28 +123,20 @@ int main(void)
         glUseProgram(shaderProgram);
 
         // Camera
-        updateCamera(window, camera, mvp);                       // compute new mvp
-        glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, &mvp[0][0]); // send mvp to the currently bound shader
+        if (camera_on)
+        {
+            updateCamera(window, camera, mvp);
+            glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, &mvp[0][0]);
+        }
 
         // VAO and VBO
         glBindVertexArray(mesh->VAO);
         glDrawArrays(GL_TRIANGLES, 0, mesh->vertCount);
-        glBindBuffer(GL_ARRAY_BUFFER, mesh->posVBO);
-
-        // Clean up
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
-        glUseProgram(0);
 
         glfwSwapBuffers(window); // swap front and back buffers
         glfwPollEvents();        // handle user input and window events
     }
 
-    // Clean up
-    glDeleteVertexArrays(1, &mesh->VAO);
-    glDeleteBuffers(1, &mesh->posVBO);
-    glDeleteProgram(shaderProgram);
-    glfwDestroyWindow(window);
     glfwTerminate();
     exit(EXIT_SUCCESS);
 }
@@ -171,6 +165,9 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) // close on escape
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+    if (key == GLFW_KEY_C && action == GLFW_PRESS) // turn camera mode on/off
+        camera_on = !camera_on;
 }
 
 /**
