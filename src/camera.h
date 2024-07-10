@@ -30,6 +30,7 @@ typedef struct
 /**
  * @brief Initializes camera object.
  *
+ * @param window GLFW window.
  * @param position Initial position of camera.
  */
 Camera *createCamera(GLFWwindow *window, vec3 position);
