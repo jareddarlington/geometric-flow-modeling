@@ -130,7 +130,7 @@ int main(void)
             updateCamera(window, camera, vp);
         }
 
-        computeModelMatrix(model, modelMatrix);
+        computeModelMatrix(model, &modelMatrix);
         glm_mat4_mul(vp, modelMatrix, mvp);
 
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "MVP"), 1, GL_FALSE, &mvp[0][0]);
