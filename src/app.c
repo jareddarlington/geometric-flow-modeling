@@ -15,7 +15,6 @@
 #include <stdio.h>
 
 // TODO: Look more into computing geometric flows on discrete surfaces
-// TODO: Spawn object not on top of player (or vice versa idk)
 
 /*
  * Constants

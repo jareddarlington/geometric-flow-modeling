@@ -56,6 +56,12 @@ Model *createModel(Mesh *mesh);
  */
 void destroyModel(Model *model);
 
+/**
+ * @brief Computes model matrix for use in MVP.
+ *
+ * @param model Model to generate matrix for.
+ * @param dest  Destination of model matrix.
+ */
 void computeModelMatrix(Model *model, mat4 *dest);
 
 /**
