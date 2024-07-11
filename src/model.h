@@ -29,7 +29,7 @@ typedef struct
     Mesh *mesh;          // mesh
     vec3 position;       // position
     vec3 rotation;       // rotation
-    float scale;         // scale
+    vec3 scale;          // scale
     GLuint renderMethod; // render method
 } Model;
 
@@ -55,6 +55,8 @@ Model *createModel(Mesh *mesh);
  * @param model Model to destroy.
  */
 void destroyModel(Model *model);
+
+void computeModelMatrix(Model *model, mat4 *dest);
 
 /**
  * @brief Creates mesh and binds buffers.

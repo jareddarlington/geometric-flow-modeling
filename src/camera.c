@@ -42,7 +42,7 @@ void updateVectors(Camera *camera)
     glm_vec3_cross(camera->right, camera->front, camera->up);
 }
 
-void updateCamera(GLFWwindow *window, Camera *camera, mat4 mvp)
+void updateCamera(GLFWwindow *window, Camera *camera, mat4 vp)
 {
     static double lastTime = 0.0; // init time (first function call)
 
@@ -101,7 +101,7 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 mvp)
     mat4 projection; // projection matrix
     mat4 view;       // camera matrix
     mat4 model;      // model matrix
-    mat4 tempMVP;    // temporary MVP
+    mat4 tempVP;     // temporary VP
 
     vec3 posDestTemp;
     glm_vec3_add(camera->position, camera->front, posDestTemp);
@@ -112,10 +112,9 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 mvp)
                camera->up,                                                        // up
                view);                                                             // destination
     glm_mat4_identity(model);                                                     // identity matrix for model
-    glm_mat4_mul(projection, view, tempMVP);                                      // MVP = projection * view
-    glm_mat4_mul(tempMVP, model, tempMVP);                                        // MVP = MVP * model
+    glm_mat4_mul(projection, view, tempVP);                                       // VP = projection * view
 
-    glm_mat4_copy(tempMVP, mvp); // copy over computed mvp
+    glm_mat4_copy(tempVP, vp); // copy over computed vp
 
     lastTime = currentTime; // update last time taken
 }

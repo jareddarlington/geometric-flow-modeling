@@ -10,16 +10,14 @@
 
 #include <cglm/cglm.h>
 
-// TODO: fix position, rotation, scale, etc not working / not being used (I think I need to to matrix mul with mvp in app.c) (make graphics file for drawing)
-
 Model *createModel(Mesh *mesh)
 {
-    Model *model = malloc(sizeof(Model));                       // allocate model memory
-    model->mesh = mesh;                                         // set mesh
-    glm_vec3_copy((vec3){0.0f, 0.0f, -10.0f}, model->position); // set position
-    glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, model->rotation);   // set rotation
-    model->scale = 0.0001f;                                     // set scale
-    model->renderMethod = GL_TRIANGLES;                         // set render method
+    Model *model = malloc(sizeof(Model));                     // allocate model memory
+    model->mesh = mesh;                                       // set mesh
+    glm_vec3_copy((vec3){0.0f, 0.0f, 2.0f}, model->position); // set position
+    glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, model->rotation); // set rotation
+    glm_vec3_copy((vec3){1.0f, 1.0f, 1.0f}, model->scale);    // set scale
+    model->renderMethod = GL_TRIANGLES;                       // set render method
     return model;
 }
 
@@ -27,6 +25,25 @@ void destroyModel(Model *model)
 {
     destroyMesh(model->mesh); // destroy mesh
     free(model);              // free model memory
+}
+
+void computeModelMatrix(Model *model, mat4 *dest)
+{
+    mat4 modelMatrix;
+    glm_mat4_identity(modelMatrix);
+
+    // Translation
+    glm_translate(modelMatrix, model->position);
+
+    // Rotation
+    glm_rotate(modelMatrix, model->rotation[0], (vec3){1.0f, 0.0f, 0.0f});
+    glm_rotate(modelMatrix, model->rotation[1], (vec3){0.0f, 1.0f, 0.0f});
+    glm_rotate(modelMatrix, model->rotation[2], (vec3){0.0f, 0.0f, 1.0f});
+
+    // Scaling
+    glm_scale(modelMatrix, model->scale);
+
+    glm_mat4_copy(modelMatrix, dest); // copy over computed vp
 }
 
 Mesh *createMesh(const char *filename)

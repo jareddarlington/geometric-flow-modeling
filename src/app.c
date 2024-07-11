@@ -102,10 +102,12 @@ int main(void)
     GLuint shaderProgram = createShaderProgram("./shaders/vertex.glsl", "./shaders/fragment.glsl");
 
     Mesh *mesh = createMesh("models/sphere.obj");
+    Model *model = createModel(mesh);
 
     // MVP matrix
-    GLuint mvpUniform = glGetUniformLocation(shaderProgram, "MVP"); // grab handle for MVP uniform
-    mat4 mvp;                                                       // matrix to compute
+    mat4 modelMatrix;
+    mat4 vp;
+    mat4 mvp;
 
     // Create camera
     vec3 initPos = {0.0f, 0.0f, 0.0f};
@@ -125,13 +127,17 @@ int main(void)
         // Camera
         if (camera_on)
         {
-            updateCamera(window, camera, mvp);
-            glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, &mvp[0][0]);
+            updateCamera(window, camera, vp);
         }
 
+        computeModelMatrix(model, modelMatrix);
+        glm_mat4_mul(vp, modelMatrix, mvp);
+
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "MVP"), 1, GL_FALSE, &mvp[0][0]);
+
         // VAO and VBO
-        glBindVertexArray(mesh->VAO);
-        glDrawArrays(GL_TRIANGLES, 0, mesh->vertCount);
+        glBindVertexArray(model->mesh->VAO);
+        glDrawArrays(GL_TRIANGLES, 0, model->mesh->vertCount);
 
         glfwSwapBuffers(window); // swap front and back buffers
         glfwPollEvents();        // handle user input and window events

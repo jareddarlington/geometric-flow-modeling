@@ -43,12 +43,12 @@ Camera *createCamera(GLFWwindow *window, vec3 position);
 void updateVectors(Camera *camera);
 
 /**
- * @brief Recomputes MVP based on user input and camera info.
+ * @brief Recomputes VP based on user input and camera info.
  *
  * @param window GLFW window.
  * @param camera Camera to update and read from.
- * @param mvp    MVP matrix to update.
+ * @param vp    VP matrix to update.
  */
-void updateCamera(GLFWwindow *window, Camera *camera, mat4 mvp);
+void updateCamera(GLFWwindow *window, Camera *camera, mat4 vp);
 
 #endif
