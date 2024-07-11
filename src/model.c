@@ -12,12 +12,12 @@
 
 Model *createModel(Mesh *mesh)
 {
-    Model *model = malloc(sizeof(Model));                     // allocate model memory
-    model->mesh = mesh;                                       // set mesh
-    glm_vec3_copy((vec3){0.0f, 0.0f, 2.0f}, model->position); // set position
-    glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, model->rotation); // set rotation
-    glm_vec3_copy((vec3){1.0f, 1.0f, 1.0f}, model->scale);    // set scale
-    model->renderMethod = GL_TRIANGLES;                       // set render method
+    Model *model = malloc(sizeof(Model));                      // allocate model memory
+    model->mesh = mesh;                                        // set mesh
+    glm_vec3_copy((vec3){0.0f, 0.0f, 3.0f}, model->position);  // set position
+    glm_vec3_copy((vec3){0.0f, -M_PI, 0.0f}, model->rotation); // set rotation
+    glm_vec3_copy((vec3){1.0f, 1.0f, 1.0f}, model->scale);     // set scale
+    model->renderMethod = GL_TRIANGLES;                        // set render method
     return model;
 }
 
@@ -43,12 +43,14 @@ void computeModelMatrix(Model *model, mat4 *dest)
     // Scaling
     glm_scale(modelMatrix, model->scale);
 
-    glm_mat4_copy(modelMatrix, dest); // copy over computed vp
+    glm_mat4_copy(modelMatrix, *dest); // copy over computed vp
 }
 
 Mesh *createMesh(const char *filename)
 {
     DynamicArray *dArray = loadOBJ(filename);
+    // DynamicArray *trianglesDArray;
+    // loadOBJ(filename, verticesDArray, trianglesDArray);
 
     Mesh *mesh = malloc(sizeof(Mesh));       // allocate mesh memory
     mesh->vertices = dArray->array;          // set vertices
@@ -88,20 +90,28 @@ void destroyMesh(Mesh *mesh)
     free(mesh);
 }
 
+// void loadOBJ(const char *filename, DynamicArray *verticesDest, DynamicArray *trianglesDest)
 DynamicArray *loadOBJ(const char *filename)
 {
+    // Init arrays
     Vertex v[VERTEX_LIMIT];
     Vertex vt[VERTEX_LIMIT];
     Vertex vn[VERTEX_LIMIT];
 
+    // Init counts
     int v_count = 0;
     int vt_count = 0;
     int vn_count = 0;
 
+    // Init vertices dynamic array
     DynamicArray *vertices = malloc(sizeof(DynamicArray));
     init(vertices, 160);
 
-    FILE *fp = fopen(filename, "r");
+    // Init triangles dynamic array
+    // DynamicArray *triangles = malloc(sizeof(DynamicArray));
+    // init(triangles, 160);
+
+    FILE *fp = fopen(filename, "r"); // open file in read mode
     if (fp == NULL)
     {
         printf("Error opening file: %s\n", filename);
@@ -112,36 +122,38 @@ DynamicArray *loadOBJ(const char *filename)
     size_t len = 0;
     ssize_t read;
 
-    while ((read = getline(&line, &len, fp)) != -1)
+    while ((read = getline(&line, &len, fp)) != -1) // read each line in file
     {
+        // Parse line
         char *words[4];
-        words[0] = strtok(line, " ");
+        words[0] = strtok(line, " "); // split line string
         for (int i = 1; i < 4; ++i)
         {
-            words[i] = strtok(NULL, " ");
+            words[i] = strtok(NULL, " "); // NULL arg means continue tokenizing the same string
         }
 
-        if (strcmp(words[0], "v") == 0)
+        // Convert string values to floats and store them
+        if (strcmp(words[0], "v") == 0) // vertex
         {
             v[v_count].x = atof(words[1]);
             v[v_count].y = atof(words[2]);
             v[v_count].z = atof(words[3]);
             v_count++;
         }
-        else if (strcmp(words[0], "vt") == 0)
+        else if (strcmp(words[0], "vt") == 0) // texture
         {
             vt[vt_count].x = atof(words[1]);
             vt[vt_count].y = atof(words[2]);
             vt_count++;
         }
-        else if (strcmp(words[0], "vn") == 0)
+        else if (strcmp(words[0], "vn") == 0) // normal
         {
             vn[vn_count].x = atof(words[1]);
             vn[vn_count].y = atof(words[2]);
             vn[vn_count].z = atof(words[3]);
             vn_count++;
         }
-        else if (strcmp(words[0], "f") == 0)
+        else if (strcmp(words[0], "f") == 0) // face
         {
             char *v1[3];
             char *v2[3];
@@ -160,20 +172,31 @@ DynamicArray *loadOBJ(const char *filename)
             processVertex(vertices, v1, v, vt, vn);
             processVertex(vertices, v2, v, vt, vn);
             processVertex(vertices, v3, v, vt, vn);
+
+            // push(triangles, );
+            // tri_count++;
         }
     }
-    fclose(fp);
-    if (line)
+
+    fclose(fp); // close file
+    if (line)   // clean up
     {
         free(line);
     }
 
+    // for (int i = 0; i < vertices->size; i++)
+    // {
+    //     printf("%d", vertices[i]);
+    // }
+
     return vertices;
+    // verticesDest = vertices;
+    // trianglesDest = triangles;
 }
 
 void processVertex(DynamicArray *vertices, char *vertexData[3], Vertex v[], Vertex vt[], Vertex vn[])
 {
-    int vertex_ptr = atoi(vertexData[0]) - 1; // ASCII to Integer
+    int vertex_ptr = atoi(vertexData[0]) - 1; // ASCII to integer
     int texture_ptr = atoi(vertexData[1]) - 1;
     int normal_ptr = atoi(vertexData[2]) - 1;
 

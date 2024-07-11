@@ -83,6 +83,7 @@ void destroyMesh(Mesh *mesh);
  *
  * @param .obj filename.
  */
+// void loadOBJ(const char *filename, DynamicArray *verticesDest, DynamicArray *trianglesDest);
 DynamicArray *loadOBJ(const char *filename);
 
 /**

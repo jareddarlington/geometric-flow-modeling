@@ -75,6 +75,7 @@ int main(void)
     glfwSetKeyCallback(window, key_callback);                          // set close on escape
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // callback function for frame resizing
     glfwSwapInterval(1);                                               // set buffer swap timing
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
     /*
      * OpenGL / Glad Setup
@@ -101,7 +102,7 @@ int main(void)
     // Shaders and meshes
     GLuint shaderProgram = createShaderProgram("./shaders/vertex.glsl", "./shaders/fragment.glsl");
 
-    Mesh *mesh = createMesh("models/sphere.obj");
+    Mesh *mesh = createMesh("models/ico_sphere.obj");
     Model *model = createModel(mesh);
 
     // MVP matrix
@@ -173,7 +174,17 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 
     if (key == GLFW_KEY_C && action == GLFW_PRESS) // turn camera mode on/off
+    {
         camera_on = !camera_on;
+        if (camera_on)
+        {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+        }
+        else
+        {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
+    }
 }
 
 /**
