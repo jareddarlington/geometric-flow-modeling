@@ -15,6 +15,7 @@
 #include <stdio.h>
 
 // TODO: Look more into computing geometric flows on discrete surfaces
+// TODO: Fix color (probably a shader thing (i could also maybe give model structs a color option))
 
 /*
  * Constants
