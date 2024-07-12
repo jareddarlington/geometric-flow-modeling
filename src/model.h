@@ -9,7 +9,7 @@
 #include "utils.h"
 
 #define VERTEX_LIMIT 2000
-#define STRIDE 8
+#define STRIDE 6
 #define MAX_INSTANCES 20000
 
 /*
@@ -83,7 +83,6 @@ void destroyMesh(Mesh *mesh);
  *
  * @param .obj filename.
  */
-// void loadOBJ(const char *filename, DynamicArray *verticesDest, DynamicArray *trianglesDest);
 DynamicArray *loadOBJ(const char *filename);
 
 /**
@@ -92,9 +91,8 @@ DynamicArray *loadOBJ(const char *filename);
  * @param vertices   Dynamic Array to add to.
  * @param vertexData Vertex data.
  * @param v          Vertices.
- * @param vt         Texture coordinates of vertices.
  * @param vn         Normals of vertices.
  */
-void processVertex(DynamicArray *vertices, char *vertexData[3], Vertex v[], Vertex vt[], Vertex vn[]);
+void processVertex(DynamicArray *vertices, char *vertexData[3], Vertex v[], Vertex vn[]);
 
 #endif

@@ -49,8 +49,6 @@ void computeModelMatrix(Model *model, mat4 *dest)
 Mesh *createMesh(const char *filename)
 {
     DynamicArray *verticesDArray = loadOBJ(filename);
-    // DynamicArray *trianglesDArray;
-    // loadOBJ(filename, verticesDArray, trianglesDArray);
 
     Mesh *mesh = malloc(sizeof(Mesh));               // allocate mesh memory
     mesh->vertices = verticesDArray->array;          // set vertices
@@ -65,17 +63,13 @@ Mesh *createMesh(const char *filename)
     glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * STRIDE * mesh->vertCount, mesh->vertices, GL_STATIC_DRAW);
 
-    // Position attribute
+    // Position attribute (location = 0)
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, STRIDE * sizeof(float), (void *)0);
 
-    // Normal attribute
+    // Normal attribute (location = 1)
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, STRIDE * sizeof(float), (void *)12);
-
-    // Texture attribute (not really need as it's not in use right now)
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, STRIDE * sizeof(float), (void *)24);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -98,21 +92,15 @@ DynamicArray *loadOBJ(const char *filename)
 {
     // Init arrays
     Vertex v[VERTEX_LIMIT];
-    Vertex vt[VERTEX_LIMIT];
     Vertex vn[VERTEX_LIMIT];
 
     // Init counts
     int v_count = 0;
-    int vt_count = 0;
     int vn_count = 0;
 
     // Init vertices dynamic array
     DynamicArray *vertices = malloc(sizeof(DynamicArray));
     init(vertices, 160);
-
-    // Init triangles dynamic array
-    // DynamicArray *triangles = malloc(sizeof(DynamicArray));
-    // init(triangles, 160);
 
     FILE *fp = fopen(filename, "r"); // open file in read mode
     if (fp == NULL)
@@ -143,12 +131,6 @@ DynamicArray *loadOBJ(const char *filename)
             v[v_count].z = atof(words[3]);
             v_count++;
         }
-        else if (strcmp(words[0], "vt") == 0) // texture
-        {
-            vt[vt_count].x = atof(words[1]);
-            vt[vt_count].y = atof(words[2]);
-            vt_count++;
-        }
         else if (strcmp(words[0], "vn") == 0) // normal
         {
             vn[vn_count].x = atof(words[1]);
@@ -172,9 +154,9 @@ DynamicArray *loadOBJ(const char *filename)
             v3[1] = strtok(NULL, "/");
             v3[2] = strtok(NULL, "/");
 
-            processVertex(vertices, v1, v, vt, vn);
-            processVertex(vertices, v2, v, vt, vn);
-            processVertex(vertices, v3, v, vt, vn);
+            processVertex(vertices, v1, v, vn);
+            processVertex(vertices, v2, v, vn);
+            processVertex(vertices, v3, v, vn);
         }
     }
 
@@ -184,21 +166,19 @@ DynamicArray *loadOBJ(const char *filename)
         free(line);
     }
 
+    // DEBUG
     // for (int i = 0; i < vertices->size; i++)
     // {
     //     printf("%f\n", vertices->array[i]);
     // }
 
     return vertices;
-    // verticesDest = vertices;
-    // trianglesDest = triangles;
 }
 
-void processVertex(DynamicArray *vertices, char *vertexData[3], Vertex v[], Vertex vt[], Vertex vn[])
+void processVertex(DynamicArray *vertices, char *vertexData[3], Vertex v[], Vertex vn[])
 {
     int vertex_ptr = atoi(vertexData[0]) - 1; // ASCII to integer
-    int texture_ptr = atoi(vertexData[1]) - 1;
-    int normal_ptr = atoi(vertexData[2]) - 1;
+    int normal_ptr = atoi(vertexData[1]) - 1;
 
     push(vertices, v[vertex_ptr].x);
     push(vertices, v[vertex_ptr].y);
@@ -207,7 +187,4 @@ void processVertex(DynamicArray *vertices, char *vertexData[3], Vertex v[], Vert
     push(vertices, vn[normal_ptr].x);
     push(vertices, vn[normal_ptr].y);
     push(vertices, vn[normal_ptr].z);
-
-    push(vertices, vt[texture_ptr].x);
-    push(vertices, vt[texture_ptr].y);
 }
