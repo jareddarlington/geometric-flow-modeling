@@ -48,13 +48,13 @@ void computeModelMatrix(Model *model, mat4 *dest)
 
 Mesh *createMesh(const char *filename)
 {
-    DynamicArray *dArray = loadOBJ(filename);
+    DynamicArray *verticesDArray = loadOBJ(filename);
     // DynamicArray *trianglesDArray;
     // loadOBJ(filename, verticesDArray, trianglesDArray);
 
-    Mesh *mesh = malloc(sizeof(Mesh));       // allocate mesh memory
-    mesh->vertices = dArray->array;          // set vertices
-    mesh->vertCount = dArray->size / STRIDE; // set vertices count
+    Mesh *mesh = malloc(sizeof(Mesh));               // allocate mesh memory
+    mesh->vertices = verticesDArray->array;          // set vertices
+    mesh->vertCount = verticesDArray->size / STRIDE; // set vertices count
 
     // Vertex Array Object
     glGenVertexArrays(1, &(mesh->VAO));
@@ -73,6 +73,10 @@ Mesh *createMesh(const char *filename)
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, STRIDE * sizeof(float), (void *)12);
 
+    // Texture attribute (not really need as it's not in use right now)
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, STRIDE * sizeof(float), (void *)24);
+
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -90,7 +94,6 @@ void destroyMesh(Mesh *mesh)
     free(mesh);
 }
 
-// void loadOBJ(const char *filename, DynamicArray *verticesDest, DynamicArray *trianglesDest)
 DynamicArray *loadOBJ(const char *filename)
 {
     // Init arrays
@@ -172,9 +175,6 @@ DynamicArray *loadOBJ(const char *filename)
             processVertex(vertices, v1, v, vt, vn);
             processVertex(vertices, v2, v, vt, vn);
             processVertex(vertices, v3, v, vt, vn);
-
-            // push(triangles, );
-            // tri_count++;
         }
     }
 
@@ -186,7 +186,7 @@ DynamicArray *loadOBJ(const char *filename)
 
     // for (int i = 0; i < vertices->size; i++)
     // {
-    //     printf("%d", vertices[i]);
+    //     printf("%f\n", vertices->array[i]);
     // }
 
     return vertices;
