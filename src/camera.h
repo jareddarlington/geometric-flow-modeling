@@ -6,8 +6,21 @@
 
 #include <cglm/cglm.h>
 
+// Movement settings
 #define SPEED 5.0f
 #define MOUSE_SPEED 0.005f
+
+// Camera init settings
+#define INIT_POSITION \
+    (vec3) { 0.0f, 0.0f, -3.0f } // camera inital position
+#define INIT_YAW 0               // camera inital yaw / horizontal angle
+#define INIT_PITCH 0             // camera inital pitch / vertical angle
+#define INIT_FOV 90              // camera init fov
+
+// Camera settings
+#define ASPECT_RATIO 4.0f / 3.0f // camera aspect ratio
+#define NEAR_Z 0.1f              // near value for z buffer (clipping plane)
+#define FAR_Z 100.0f             // far value for z buffer (clipping plane)
 
 /**
  * @brief Holds camera information.
@@ -31,9 +44,8 @@ typedef struct
  * @brief Initializes camera object.
  *
  * @param window GLFW window.
- * @param position Initial position of camera.
  */
-Camera *createCamera(GLFWwindow *window, vec3 position);
+Camera *createCamera(GLFWwindow *window);
 
 /**
  * @brief Recomputes front, right, and up vectors for camera.

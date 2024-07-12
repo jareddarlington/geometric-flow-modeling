@@ -9,17 +9,17 @@
 
 // TODO: Create a seperate camera that rotates around the object ( position = ObjectCenter + ( radius * cos(time), height, radius * sin(time) ) ); bind the radius/height/time to the keyboard/mouse, or whatever
 
-Camera *createCamera(GLFWwindow *window, vec3 position)
+Camera *createCamera(GLFWwindow *window)
 {
     int winWidth, winHeight;
     glfwGetWindowSize(window, &winWidth, &winHeight);
     glfwSetCursorPos(window, winWidth / 2, winHeight / 2);
 
     Camera *camera = malloc(sizeof(Camera));
-    glm_vec3_copy(camera->position, position);
-    camera->yaw = 0;
-    camera->pitch = 0;
-    camera->fov = 90;
+    glm_vec3_copy(INIT_POSITION, camera->position);
+    camera->yaw = INIT_YAW;
+    camera->pitch = INIT_PITCH;
+    camera->fov = INIT_FOV;
     updateVectors(camera);
     return camera;
 };
@@ -106,13 +106,13 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 vp)
     vec3 posDestTemp;
     glm_vec3_add(camera->position, camera->front, posDestTemp);
 
-    glm_perspective(glm_rad(camera->fov), 4.0f / 3.0f, 0.1f, 100.0f, projection); // fov, aspect ratio, near value, far value, destination
-    glm_lookat(camera->position,                                                  // camera position (world space)
-               posDestTemp,                                                       // direction
-               camera->up,                                                        // up
-               view);                                                             // destination
-    glm_mat4_identity(model);                                                     // identity matrix for model
-    glm_mat4_mul(projection, view, tempVP);                                       // VP = projection * view
+    glm_perspective(glm_rad(camera->fov), ASPECT_RATIO, NEAR_Z, FAR_Z, projection); // fov, aspect ratio, near value, far value, destination
+    glm_lookat(camera->position,                                                    // camera position (world space)
+               posDestTemp,                                                         // direction
+               camera->up,                                                          // up
+               view);                                                               // destination
+    glm_mat4_identity(model);                                                       // identity matrix for model
+    glm_mat4_mul(projection, view, tempVP);                                         // VP = projection * view
 
     glm_mat4_copy(tempVP, vp); // copy over computed vp
 

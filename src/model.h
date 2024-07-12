@@ -8,9 +8,17 @@
 
 #include "utils.h"
 
+// Vertex management settings
 #define VERTEX_LIMIT 2000
 #define STRIDE 6
-#define MAX_INSTANCES 20000
+
+// Model init settings
+#define INIT_POSITION \
+    (vec3) { 0.0f, 0.0f, 0.0f }
+#define INIT_ROTATION \
+    (vec3) { 0.0f, -M_PI, 0.0f }
+#define INIT_SCALE \
+    (vec3) { 1.0f, 1.0f, 1.0f }
 
 /*
  * Structures

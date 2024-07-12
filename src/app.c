@@ -72,7 +72,7 @@ int main(void)
     glfwSetKeyCallback(window, key_callback);                          // set close on escape
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // callback function for frame resizing
     glfwSwapInterval(1);                                               // set buffer swap timing
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);         // set cursor to hidden
 
     /*
      * OpenGL / Glad Setup
@@ -90,7 +90,7 @@ int main(void)
     glEnable(GL_DEPTH_TEST);                       // enable depth test (z-buffer)
     glDepthFunc(GL_LESS);                          // use fragment closer to the camera
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);     // enable polygon mode globally
-    // glEnable(GL_CULL_FACE);                        // enable face culling (skips rendering non-visible polygons) // TODO: Enable later
+    glEnable(GL_CULL_FACE);                        // enable face culling (skips rendering non-visible polygons)
 
     /*
      * Initialization
@@ -108,8 +108,7 @@ int main(void)
     mat4 mvp;
 
     // Create camera
-    vec3 initPos = {0.0f, 0.0f, 0.0f};
-    Camera *camera = createCamera(window, initPos);
+    Camera *camera = createCamera(window);
 
     /*
      * Rendering Loop

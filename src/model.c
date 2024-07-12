@@ -14,12 +14,12 @@
 
 Model *createModel(Mesh *mesh)
 {
-    Model *model = malloc(sizeof(Model));                      // allocate model memory
-    model->mesh = mesh;                                        // set mesh
-    glm_vec3_copy((vec3){0.0f, 0.0f, 3.0f}, model->position);  // set position
-    glm_vec3_copy((vec3){0.0f, -M_PI, 0.0f}, model->rotation); // set rotation
-    glm_vec3_copy((vec3){1.0f, 1.0f, 1.0f}, model->scale);     // set scale
-    model->renderMethod = GL_TRIANGLES;                        // set render method
+    Model *model = malloc(sizeof(Model));          // allocate model memory
+    model->mesh = mesh;                            // set mesh
+    glm_vec3_copy(INIT_POSITION, model->position); // set position
+    glm_vec3_copy(INIT_ROTATION, model->rotation); // set rotation
+    glm_vec3_copy(INIT_SCALE, model->scale);       // set scale
+    model->renderMethod = GL_TRIANGLES;            // set render method
     return model;
 }
 
@@ -38,9 +38,9 @@ void computeModelMatrix(Model *model, mat4 *dest)
     glm_translate(modelMatrix, model->position);
 
     // Rotation
-    glm_rotate(modelMatrix, model->rotation[0], (vec3){1.0f, 0.0f, 0.0f});
-    glm_rotate(modelMatrix, model->rotation[1], (vec3){0.0f, 1.0f, 0.0f});
-    glm_rotate(modelMatrix, model->rotation[2], (vec3){0.0f, 0.0f, 1.0f});
+    glm_rotate(modelMatrix, model->rotation[0], GLM_XUP);
+    glm_rotate(modelMatrix, model->rotation[1], GLM_YUP);
+    glm_rotate(modelMatrix, model->rotation[2], GLM_ZUP);
 
     // Scaling
     glm_scale(modelMatrix, model->scale);
