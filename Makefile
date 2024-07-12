@@ -30,4 +30,5 @@ debug: CFLAGS += -DDEBUG -O0 -g
 debug: clean $(TARGET)
 
 clean:
-	rm -rf $(BIN_DIR) $(TARGET)
+	rm -rf $(BIN_DIR)/*.o $(TARGET)
+	find $(BIN_DIR) -type f ! -name 'glfw3.dll' -delete
