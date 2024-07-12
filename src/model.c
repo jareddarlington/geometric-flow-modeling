@@ -50,11 +50,8 @@ void computeModelMatrix(Model *model, mat4 *dest)
 
 Mesh *createMesh(const char *filename)
 {
-    DynamicArray *verticesDArray = loadOBJ(filename);
-
-    Mesh *mesh = malloc(sizeof(Mesh));               // allocate mesh memory
-    mesh->vertices = verticesDArray->array;          // set vertices
-    mesh->vertCount = verticesDArray->size / STRIDE; // set vertices count
+    Mesh *mesh = malloc(sizeof(Mesh)); // allocate mesh memory
+    loadOBJ(filename, mesh);
 
     // Vertex Array Object
     glGenVertexArrays(1, &(mesh->VAO));
@@ -70,8 +67,8 @@ Mesh *createMesh(const char *filename)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, STRIDE * sizeof(float), (void *)0);
 
     // Normal attribute (location = 1)
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, STRIDE * sizeof(float), (void *)12);
+    // glEnableVertexAttribArray(1);
+    // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, STRIDE * sizeof(float), (void *)12);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -86,15 +83,17 @@ void destroyMesh(Mesh *mesh)
     free(mesh);
 }
 
-DynamicArray *loadOBJ(const char *filename)
+void loadOBJ(const char *filename, Mesh *mesh)
 {
     // Init arrays
     Vertex v[VERTEX_LIMIT];
     Vertex vn[VERTEX_LIMIT];
+    Face faces[VERTEX_LIMIT];
 
     // Init counts
-    int v_count = 0;
-    int vn_count = 0;
+    int vCount = 0;
+    int vnCount = 0;
+    int fCount = 0;
 
     // Init vertices dynamic array
     DynamicArray *vertices = malloc(sizeof(DynamicArray));
@@ -115,7 +114,7 @@ DynamicArray *loadOBJ(const char *filename)
     {
         // Parse line
         char *words[4];
-        words[0] = strtok(line, " "); // split line string
+        words[0] = strtok(line, " "); // split line
         for (int i = 1; i < 4; ++i)
         {
             words[i] = strtok(NULL, " "); // NULL arg means continue tokenizing the same string
@@ -124,17 +123,17 @@ DynamicArray *loadOBJ(const char *filename)
         // Convert string values to floats and store them
         if (strcmp(words[0], "v") == 0) // vertex
         {
-            v[v_count].x = atof(words[1]);
-            v[v_count].y = atof(words[2]);
-            v[v_count].z = atof(words[3]);
-            v_count++;
+            v[vCount].x = atof(words[1]);
+            v[vCount].y = atof(words[2]);
+            v[vCount].z = atof(words[3]);
+            vCount++;
         }
         else if (strcmp(words[0], "vn") == 0) // normal
         {
-            vn[vn_count].x = atof(words[1]);
-            vn[vn_count].y = atof(words[2]);
-            vn[vn_count].z = atof(words[3]);
-            vn_count++;
+            vn[vnCount].x = atof(words[1]);
+            vn[vnCount].y = atof(words[2]);
+            vn[vnCount].z = atof(words[3]);
+            vnCount++;
         }
         else if (strcmp(words[0], "f") == 0) // face
         {
@@ -142,9 +141,9 @@ DynamicArray *loadOBJ(const char *filename)
             char *v2[3];
             char *v3[3];
 
-            v1[0] = strtok(words[1], "/");
-            v1[1] = strtok(NULL, "/");
-            v1[2] = strtok(NULL, "/");
+            v1[0] = strtok(words[1], "/"); // vertex index
+            v1[1] = strtok(NULL, "/");     // texture index
+            v1[2] = strtok(NULL, "/");     // normal index
             v2[0] = strtok(words[2], "/");
             v2[1] = strtok(NULL, "/");
             v2[2] = strtok(NULL, "/");
@@ -155,6 +154,12 @@ DynamicArray *loadOBJ(const char *filename)
             processVertex(vertices, v1, v, vn);
             processVertex(vertices, v2, v, vn);
             processVertex(vertices, v3, v, vn);
+
+            // Change from 1 to 0 based index
+            faces[fCount].v1 = atoi(v1[0]) - 1;
+            faces[fCount].v2 = atoi(v2[0]) - 1;
+            faces[fCount].v3 = atoi(v3[0]) - 1;
+            fCount++;
         }
     }
 
@@ -165,25 +170,36 @@ DynamicArray *loadOBJ(const char *filename)
         free(line);
     }
 
+    // Copy data into mesh
+    mesh->vertices = vertices->array;
+    mesh->vertCount = vertices->size / STRIDE; // equal to # of faces * # of vertices per face (3 here because of triangular faces) * # of dimensions (xyz so 3) / stride (3)
+    mesh->faces = faces;
+    mesh->faceCount = fCount;
+
     // DEBUG
-    // for (int i = 0; i < vertices->size; i++)
+
+    // printf("%d\n", mesh->vertCount);
+    // for (int i = 0; i < mesh->vertCount; i++)
     // {
-    //     printf("%f\n", vertices->array[i]);
+    //     printf("%f\n", mesh->vertices[i]);
     // }
 
-    return vertices;
+    // printf("%d\n", fCount);
+    // for (int i = 0; i < fCount; i++)
+    //     printf("%d %d %d\n", faces[i].v1, faces[i].v2, faces[i].v3);
 }
 
 void processVertex(DynamicArray *vertices, char *vertexData[3], Vertex v[], Vertex vn[])
 {
-    int vertex_ptr = atoi(vertexData[0]) - 1; // ASCII to integer
-    int normal_ptr = atoi(vertexData[1]) - 1;
+    // Change from 1 to 0 based index
+    int vertexPtr = atoi(vertexData[0]) - 1; // ASCII to integer
+    int normalPtr = atoi(vertexData[1]) - 1;
 
-    push(vertices, v[vertex_ptr].x);
-    push(vertices, v[vertex_ptr].y);
-    push(vertices, v[vertex_ptr].z);
+    push(vertices, v[vertexPtr].x);
+    push(vertices, v[vertexPtr].y);
+    push(vertices, v[vertexPtr].z);
 
-    push(vertices, vn[normal_ptr].x);
-    push(vertices, vn[normal_ptr].y);
-    push(vertices, vn[normal_ptr].z);
+    // push(vertices, vn[normalPtr].x);
+    // push(vertices, vn[normalPtr].y);
+    // push(vertices, vn[normalPtr].z);
 }

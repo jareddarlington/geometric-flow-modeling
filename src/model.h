@@ -10,7 +10,7 @@
 
 // Vertex management settings
 #define VERTEX_LIMIT 2000
-#define STRIDE 6
+#define STRIDE 3
 
 // Model init settings
 #define INIT_MODEL_POSITION \
@@ -26,10 +26,17 @@
 
 typedef struct
 {
+    int v1, v2, v3; // indices of vertices in face (assumes face are triangular)
+} Face;
+
+typedef struct
+{
     int vertCount;   // number of vertices
     float *vertices; // vertices
-    GLuint VAO;      // vertex array object
-    GLuint VBO;      // vertex buffer object
+    int faceCount;
+    Face *faces;
+    GLuint VAO; // vertex array object
+    GLuint VBO; // vertex buffer object
 } Mesh;
 
 typedef struct
@@ -89,9 +96,10 @@ void destroyMesh(Mesh *mesh);
 /**
  * @brief Parses and loads object.
  *
- * @param .obj filename.
+ * @param filename .obj filename.
+ * @param mesh     Mesh to load data into.
  */
-DynamicArray *loadOBJ(const char *filename);
+void loadOBJ(const char *filename, Mesh *mesh);
 
 /**
  * @brief Adds vertex data to dynamic arry.

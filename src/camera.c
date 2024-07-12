@@ -8,6 +8,8 @@
 
 #include <stdio.h>
 
+// TODO: Slow rotation speed
+
 Camera *createCamera(GLFWwindow *window)
 {
     int winWidth, winHeight;

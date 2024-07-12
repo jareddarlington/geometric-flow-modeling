@@ -7,6 +7,7 @@
 #include "shader.h"
 #include "camera.h"
 #include "model.h"
+#include "geometry.h"
 
 #include <cglm/cglm.h>
 
@@ -21,17 +22,6 @@
 // TODO: Make readme and add info about each geometric flow and its algorithm
 
 /*
- * Enums
- */
-
-enum cameraMode
-{
-    ROTATE,
-    FREE,
-    OFF
-};
-
-/*
  * Constants
  */
 
@@ -41,6 +31,17 @@ enum cameraMode
 #define ANTI_ALIASING 4                 // anti-aliasing quality
 #define MAJOR_VERSION 4                 // OpenGL major version
 #define MINOR_VERION 6                  // OpenGL minor version
+
+/*
+ * Enums
+ */
+
+enum cameraMode
+{
+    ROTATE,
+    FREE,
+    OFF
+};
 
 /*
  * Function Prototypes
@@ -111,7 +112,7 @@ int main(void)
     glEnable(GL_DEPTH_TEST);                       // enable depth test (z-buffer)
     glDepthFunc(GL_LESS);                          // use fragment closer to the camera
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);     // enable polygon mode globally
-    glEnable(GL_CULL_FACE);                        // enable face culling (skips rendering non-visible polygons)
+    // glEnable(GL_CULL_FACE);                        // enable face culling (skips rendering non-visible polygons)
 
     /*
      * Initialization
@@ -120,7 +121,7 @@ int main(void)
     // Shaders and meshes
     GLuint shaderProgram = createShaderProgram("./shaders/vertex.glsl", "./shaders/fragment.glsl");
 
-    Mesh *mesh = createMesh("models/ico_sphere.obj");
+    Mesh *mesh = createMesh("models/cube.obj");
     Model *model = createModel(mesh);
 
     // MVP matrix
@@ -137,6 +138,7 @@ int main(void)
 
     while (!glfwWindowShouldClose(window))
     {
+        // Clear
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Shaders
@@ -160,12 +162,13 @@ int main(void)
 
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "MVP"), 1, GL_FALSE, &mvp[0][0]);
 
-        // VAO and VBO
+        // Draw
         glBindVertexArray(model->mesh->VAO);
         glDrawArrays(GL_TRIANGLES, 0, model->mesh->vertCount);
 
-        glfwSwapBuffers(window); // swap front and back buffers
-        glfwPollEvents();        // handle user input and window events
+        // Buffer swapping and event handling
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
 
     glfwTerminate();

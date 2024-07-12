@@ -35,7 +35,7 @@ float cotangent(vec3 v1, vec3 v2, vec3 v3)
     return dot / cross_len;
 }
 
-void computeLaplacianMatrix(int num_vertices, int num_triangles, vec3 *vertices, Triangle *triangles, float **L)
+void computeLaplacianMatrix(int num_vertices, int fCount, vec3 *vertices, Face *faces, float **L)
 {
     // Initialize the Laplacian matrix with zeros
     for (int i = 0; i < num_vertices; i++)
@@ -47,11 +47,11 @@ void computeLaplacianMatrix(int num_vertices, int num_triangles, vec3 *vertices,
     }
 
     // Compute cotangent weights and populate the Laplacian matrix
-    for (int t = 0; t < num_triangles; t++)
+    for (int t = 0; t < fCount; t++)
     {
-        int v1 = triangles[t].v1;
-        int v2 = triangles[t].v2;
-        int v3 = triangles[t].v3;
+        int v1 = faces[t].v1;
+        int v2 = faces[t].v2;
+        int v3 = faces[t].v3;
 
         float cot1 = cotangent(vertices[v1], vertices[v2], vertices[v3]);
         float cot2 = cotangent(vertices[v2], vertices[v3], vertices[v1]);
