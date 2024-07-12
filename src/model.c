@@ -10,6 +10,8 @@
 
 #include <cglm/cglm.h>
 
+// TODO: Keep track of faces for use in geometric flows (array or dynamic array or something else, this is a little bit tricky i think)
+
 Model *createModel(Mesh *mesh)
 {
     Model *model = malloc(sizeof(Model));                      // allocate model memory
@@ -71,11 +73,7 @@ Mesh *createMesh(const char *filename)
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, STRIDE * sizeof(float), (void *)12);
 
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0);
 
     return mesh;
@@ -160,8 +158,9 @@ DynamicArray *loadOBJ(const char *filename)
         }
     }
 
-    fclose(fp); // close file
-    if (line)   // clean up
+    // Clean up
+    fclose(fp);
+    if (line)
     {
         free(line);
     }
