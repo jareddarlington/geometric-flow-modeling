@@ -2,12 +2,11 @@
 #include <GLFW/glfw3.h>
 
 #include "camera.h"
+#include "model.h"
 
 #include <cglm/cglm.h>
 
 #include <stdio.h>
-
-// TODO: Create a seperate camera that rotates around the object ( position = ObjectCenter + ( radius * cos(time), height, radius * sin(time) ) ); bind the radius/height/time to the keyboard/mouse, or whatever
 
 Camera *createCamera(GLFWwindow *window)
 {
@@ -16,7 +15,7 @@ Camera *createCamera(GLFWwindow *window)
     glfwSetCursorPos(window, winWidth / 2, winHeight / 2);
 
     Camera *camera = malloc(sizeof(Camera));
-    glm_vec3_copy(INIT_POSITION, camera->position);
+    glm_vec3_copy(INIT_CAMERA_POSITION, camera->position);
     camera->yaw = INIT_YAW;
     camera->pitch = INIT_PITCH;
     camera->fov = INIT_FOV;
@@ -100,7 +99,6 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 vp)
 
     mat4 projection; // projection matrix
     mat4 view;       // camera matrix
-    mat4 model;      // model matrix
     mat4 tempVP;     // temporary VP
 
     vec3 posDestTemp;
@@ -111,7 +109,46 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 vp)
                posDestTemp,                                                         // direction
                camera->up,                                                          // up
                view);                                                               // destination
-    glm_mat4_identity(model);                                                       // identity matrix for model
+    glm_mat4_mul(projection, view, tempVP);                                         // VP = projection * view
+
+    glm_mat4_copy(tempVP, vp); // copy over computed vp
+
+    lastTime = currentTime; // update last time taken
+}
+
+void updateRotationCamera(GLFWwindow *window, Camera *camera, mat4 vp, Model *model)
+{
+    static float radius = INIT_RADIUS; // distance away from object
+
+    static double lastTime = 0.0; // init time (first function call)
+
+    if (lastTime == 0.0)
+        lastTime = glfwGetTime();
+
+    // Compute time difference between current and last frame
+    double currentTime = glfwGetTime();
+    float deltaTime = (float)(currentTime - lastTime);
+
+    camera->yaw = 0.0f;
+    camera->pitch = 0.0f;
+    glm_vec3_add(model->position, (vec3){radius * cos(glfwGetTime()), 1.0f, radius * sin(glfwGetTime())}, camera->position);
+    updateVectors(camera); // compute front, right, and up
+
+    // "Zoom" movement
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // in
+        radius -= ZOOM_SPEED * deltaTime;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // out
+        radius += ZOOM_SPEED * deltaTime;
+
+    mat4 projection; // projection matrix
+    mat4 view;       // camera matrix
+    mat4 tempVP;     // temporary VP
+
+    glm_perspective(glm_rad(camera->fov), ASPECT_RATIO, NEAR_Z, FAR_Z, projection); // fov, aspect ratio, near value, far value, destination
+    glm_lookat(camera->position,                                                    // camera position (world space)
+               model->position,                                                     // direction
+               camera->up,                                                          // up
+               view);                                                               // destination
     glm_mat4_mul(projection, view, tempVP);                                         // VP = projection * view
 
     glm_mat4_copy(tempVP, vp); // copy over computed vp

@@ -14,12 +14,12 @@
 
 Model *createModel(Mesh *mesh)
 {
-    Model *model = malloc(sizeof(Model));          // allocate model memory
-    model->mesh = mesh;                            // set mesh
-    glm_vec3_copy(INIT_POSITION, model->position); // set position
-    glm_vec3_copy(INIT_ROTATION, model->rotation); // set rotation
-    glm_vec3_copy(INIT_SCALE, model->scale);       // set scale
-    model->renderMethod = GL_TRIANGLES;            // set render method
+    Model *model = malloc(sizeof(Model));                // allocate model memory
+    model->mesh = mesh;                                  // set mesh
+    glm_vec3_copy(INIT_MODEL_POSITION, model->position); // set position
+    glm_vec3_copy(INIT_ROTATION, model->rotation);       // set rotation
+    glm_vec3_copy(INIT_SCALE, model->scale);             // set scale
+    model->renderMethod = GL_TRIANGLES;                  // set render method
     return model;
 }
 

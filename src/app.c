@@ -14,6 +14,19 @@
 #include <stddef.h>
 #include <stdio.h>
 
+// TODO: Fix camera turning away from object while going from rotate mode to free mode, I want the camera direction to be the same when transitioning
+
+/*
+ * Enums
+ */
+
+enum cameraMode
+{
+    ROTATE,
+    FREE,
+    OFF
+};
+
 /*
  * Constants
  */
@@ -33,7 +46,11 @@ void error_callback(int error, const char *description);
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
-bool camera_on = true;
+/*
+ * Globals
+ */
+
+enum cameraMode cMode = ROTATE;
 
 int main(void)
 {
@@ -71,7 +88,7 @@ int main(void)
     glfwMakeContextCurrent(window);                                    // make the window's context current
     glfwSetKeyCallback(window, key_callback);                          // set close on escape
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // callback function for frame resizing
-    glfwSwapInterval(1);                                               // set buffer swap timing
+    glfwSwapInterval(1);                                               // set buffer swap timing (vsync enabled)
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);         // set cursor to hidden
 
     /*
@@ -122,9 +139,16 @@ int main(void)
         glUseProgram(shaderProgram);
 
         // Camera
-        if (camera_on)
+        switch (cMode)
         {
+        case ROTATE:
+            updateRotationCamera(window, camera, vp, model);
+            break;
+        case FREE:
             updateCamera(window, camera, vp);
+            break;
+        case OFF:
+            break;
         }
 
         computeModelMatrix(model, &modelMatrix);
@@ -171,14 +195,20 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
 
     if (key == GLFW_KEY_C && action == GLFW_PRESS) // turn camera mode on/off
     {
-        camera_on = !camera_on;
-        if (camera_on)
+        switch (cMode)
         {
+        case ROTATE:
+            cMode = FREE;
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-        }
-        else
-        {
+            break;
+        case FREE:
+            cMode = OFF;
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            break;
+        case OFF:
+            cMode = ROTATE;
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+            break;
         }
     }
 }

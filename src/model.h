@@ -13,7 +13,7 @@
 #define STRIDE 6
 
 // Model init settings
-#define INIT_POSITION \
+#define INIT_MODEL_POSITION \
     (vec3) { 0.0f, 0.0f, 0.0f }
 #define INIT_ROTATION \
     (vec3) { 0.0f, -M_PI, 0.0f }

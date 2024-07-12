@@ -4,18 +4,22 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include "model.h"
+
 #include <cglm/cglm.h>
 
 // Movement settings
-#define SPEED 5.0f
-#define MOUSE_SPEED 0.005f
+#define SPEED 5.0f         // camera movement speed
+#define MOUSE_SPEED 0.005f // turn / look speed
+#define ZOOM_SPEED 5.0f    // change of radius speed for rotate mode
 
 // Camera init settings
-#define INIT_POSITION \
+#define INIT_CAMERA_POSITION \
     (vec3) { 0.0f, 0.0f, -3.0f } // camera inital position
 #define INIT_YAW 0               // camera inital yaw / horizontal angle
 #define INIT_PITCH 0             // camera inital pitch / vertical angle
 #define INIT_FOV 90              // camera init fov
+#define INIT_RADIUS 3.0f         // distance away from object in rotate mode
 
 // Camera settings
 #define ASPECT_RATIO 4.0f / 3.0f // camera aspect ratio
@@ -59,8 +63,18 @@ void updateVectors(Camera *camera);
  *
  * @param window GLFW window.
  * @param camera Camera to update and read from.
- * @param vp    VP matrix to update.
+ * @param vp     VP matrix to update.
  */
 void updateCamera(GLFWwindow *window, Camera *camera, mat4 vp);
+
+/**
+ * @brief Recomputes VP based on user input, time, and model info.
+ *
+ * @param window GLFW window.
+ * @param camera Camera to update and read from.
+ * @param vp     VP matrix to update.
+ * @param model  Model to rotate around.
+ */
+void updateRotationCamera(GLFWwindow *window, Camera *camera, mat4 vp, Model *model);
 
 #endif
