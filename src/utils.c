@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// TODO: Abstract delta time functionality into utils
+
 void init(DynamicArray *dynArray, size_t initCap)
 {
     dynArray->array = (float *)malloc(initCap * sizeof(float)); // allocate init space

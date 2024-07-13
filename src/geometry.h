@@ -2,4 +2,4 @@
 
 // TODO: Add doc comments
 
-void shrinkGeometry(Mesh *mesh);
+void shrinkGeometry(GLFWwindow *window, Model *model);

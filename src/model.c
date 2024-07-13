@@ -11,6 +11,7 @@
 #include <cglm/cglm.h>
 
 // TODO: Keep track of faces for use in geometric flows (array or dynamic array or something else, this is a little bit tricky i think)
+// TODO: consider swaping to glDrawElements
 
 Model *createModel(Mesh *mesh)
 {
@@ -60,7 +61,7 @@ Mesh *createMesh(const char *filename)
     // Vertex Buffer Object
     glGenBuffers(1, &(mesh->VBO));
     glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * STRIDE * mesh->vertCount, mesh->vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * STRIDE * mesh->vertCount, mesh->vertices, GL_DYNAMIC_DRAW);
 
     // Position attribute (location = 0)
     glEnableVertexAttribArray(0);

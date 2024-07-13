@@ -40,7 +40,7 @@ enum cameraMode
 {
     ROTATE,
     FREE,
-    OFF
+    LOCK
 };
 
 /*
@@ -55,7 +55,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
  * Globals
  */
 
-enum cameraMode cMode = ROTATE;
+enum cameraMode cMode = FREE;
 
 int main(void)
 {
@@ -111,8 +111,8 @@ int main(void)
     glClearColor(0.1686f, 0.1608f, 0.1686f, 1.0f); // set background colors
     glEnable(GL_DEPTH_TEST);                       // enable depth test (z-buffer)
     glDepthFunc(GL_LESS);                          // use fragment closer to the camera
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);     // enable polygon mode globally
-    glEnable(GL_CULL_FACE);                        // enable face culling (skips rendering non-visible polygons)
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);     // enable polygon mode globally
+    // glEnable(GL_CULL_FACE);                        // enable face culling (skips rendering non-visible polygons)
 
     /*
      * Initialization
@@ -121,7 +121,7 @@ int main(void)
     // Shaders and meshes
     GLuint shaderProgram = createShaderProgram("./shaders/vertex.glsl", "./shaders/fragment.glsl");
 
-    Mesh *mesh = createMesh("models/icosphere.obj");
+    Mesh *mesh = createMesh("models/cube.obj");
     Model *model = createModel(mesh);
 
     // MVP matrix
@@ -153,21 +153,22 @@ int main(void)
         case FREE:
             updateCamera(window, camera, vp);
             break;
-        case OFF:
+        case LOCK:
             break;
         }
 
         // geometric flow here i think
-        // rebind
+        shrinkGeometry(window, model);
 
+        // MVP
         computeModelMatrix(model, &modelMatrix);
         glm_mat4_mul(vp, modelMatrix, mvp);
-
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "MVP"), 1, GL_FALSE, &mvp[0][0]);
 
         // Draw
         glBindVertexArray(model->mesh->VAO);
         glDrawArrays(GL_TRIANGLES, 0, model->mesh->vertCount);
+        glBindVertexArray(0);
 
         // Buffer swapping and event handling
         glfwSwapBuffers(window);
@@ -212,10 +213,10 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
             break;
         case FREE:
-            cMode = OFF;
+            cMode = LOCK;
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             break;
-        case OFF:
+        case LOCK:
             cMode = ROTATE;
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
             break;
