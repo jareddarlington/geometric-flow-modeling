@@ -112,7 +112,7 @@ int main(void)
     glEnable(GL_DEPTH_TEST);                       // enable depth test (z-buffer)
     glDepthFunc(GL_LESS);                          // use fragment closer to the camera
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);     // enable polygon mode globally
-    // glEnable(GL_CULL_FACE);                        // enable face culling (skips rendering non-visible polygons)
+    glEnable(GL_CULL_FACE);                        // enable face culling (skips rendering non-visible polygons)
 
     /*
      * Initialization
@@ -121,7 +121,7 @@ int main(void)
     // Shaders and meshes
     GLuint shaderProgram = createShaderProgram("./shaders/vertex.glsl", "./shaders/fragment.glsl");
 
-    Mesh *mesh = createMesh("models/cube.obj");
+    Mesh *mesh = createMesh("models/icosphere.obj");
     Model *model = createModel(mesh);
 
     // MVP matrix
@@ -156,6 +156,9 @@ int main(void)
         case OFF:
             break;
         }
+
+        // geometric flow here i think
+        // rebind
 
         computeModelMatrix(model, &modelMatrix);
         glm_mat4_mul(vp, modelMatrix, mvp);

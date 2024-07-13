@@ -193,7 +193,7 @@ void processVertex(DynamicArray *vertices, char *vertexData[3], Vertex v[], Vert
 {
     // Change from 1 to 0 based index
     int vertexPtr = atoi(vertexData[0]) - 1; // ASCII to integer
-    int normalPtr = atoi(vertexData[1]) - 1;
+    // int normalPtr = atoi(vertexData[1]) - 1;
 
     push(vertices, v[vertexPtr].x);
     push(vertices, v[vertexPtr].y);
