@@ -54,6 +54,18 @@ Mesh *createMesh(const char *filename)
     Mesh *mesh = malloc(sizeof(Mesh)); // allocate mesh memory
     loadOBJ(filename, mesh);
 
+    // DEBUG
+
+    printf("%d\n", mesh->vertCount);
+    for (int i = 0; i < mesh->vertCount; i++)
+    {
+        printf("%f\n", mesh->vertices[i]);
+    }
+
+    // printf("%d\n", fCount);
+    // for (int i = 0; i < fCount; i++)
+    //     printf("%d %d %d\n", faces[i].v1, faces[i].v2, faces[i].v3);
+
     // Vertex Array Object
     glGenVertexArrays(1, &(mesh->VAO));
     glBindVertexArray(mesh->VAO);
@@ -176,18 +188,6 @@ void loadOBJ(const char *filename, Mesh *mesh)
     mesh->vertCount = vertices->size / STRIDE; // equal to # of faces * # of vertices per face (3 here because of triangular faces) * # of dimensions (xyz so 3) / stride (3)
     mesh->faces = faces;
     mesh->faceCount = fCount;
-
-    // DEBUG
-
-    // printf("%d\n", mesh->vertCount);
-    // for (int i = 0; i < mesh->vertCount; i++)
-    // {
-    //     printf("%f\n", mesh->vertices[i]);
-    // }
-
-    // printf("%d\n", fCount);
-    // for (int i = 0; i < fCount; i++)
-    //     printf("%d %d %d\n", faces[i].v1, faces[i].v2, faces[i].v3);
 }
 
 void processVertex(DynamicArray *vertices, char *vertexData[3], Vertex v[], Vertex vn[])

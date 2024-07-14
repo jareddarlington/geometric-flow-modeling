@@ -158,7 +158,7 @@ int main(void)
         }
 
         // geometric flow here i think
-        shrinkGeometry(window, model);
+        computeGeometry(window, model);
 
         // MVP
         computeModelMatrix(model, &modelMatrix);
