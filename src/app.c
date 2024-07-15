@@ -111,7 +111,7 @@ int main(void)
     glClearColor(0.1686f, 0.1608f, 0.1686f, 1.0f); // set background colors
     glEnable(GL_DEPTH_TEST);                       // enable depth test (z-buffer)
     glDepthFunc(GL_LESS);                          // use fragment closer to the camera
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);     // enable polygon mode globally
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);     // enable polygon mode globally
     // glEnable(GL_CULL_FACE);                        // enable face culling (skips rendering non-visible polygons)
 
     /*
@@ -139,7 +139,9 @@ int main(void)
     while (!glfwWindowShouldClose(window))
     {
         // Dynamically update geometry
-        computeGeometry(window, model);
+        // computeGeometry(window, model);
+        glBindBuffer(GL_ARRAY_BUFFER, model->mesh->VBO);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(model->mesh->vertices), model->mesh->vertices);
 
         // Clear
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -175,7 +177,7 @@ int main(void)
         glfwPollEvents();
     }
 
-    destroyMesh(model->mesh);
+    destroyModel(model);
     glfwTerminate();
     exit(EXIT_SUCCESS);
 }

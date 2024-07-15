@@ -15,7 +15,7 @@
 #define INIT_MODEL_POSITION \
     (vec3) { 0.0f, 0.0f, 0.0f }
 #define INIT_ROTATION \
-    (vec3) { 0.0f, -M_PI, 0.0f }
+    (vec3) { 0.0f, 0.0f, 0.0f }
 #define INIT_SCALE \
     (vec3) { 1.0f, 1.0f, 1.0f }
 
@@ -31,11 +31,11 @@ typedef struct
 
 typedef struct
 {
-    Vertex *vertices;      // vertices
-    unsigned int *indices; // indices
-    GLuint VAO;            // vertex array object
-    GLuint VBO;            // vertex buffer object
-    GLuint IBO;            // index buffer object
+    Vertex *vertices; // vertices
+    GLuint *indices;  // indices
+    GLuint VAO;       // vertex array object
+    GLuint VBO;       // vertex buffer object
+    GLuint IBO;       // index buffer object
 } Mesh;
 
 typedef struct

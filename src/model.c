@@ -38,32 +38,28 @@ Mesh *createMesh(const char *filename)
     fakeLoad(mesh);
 
     // Vertex Array Object
-    glCreateVertexArrays(1, &(mesh->VAO));
-    // glGenVertexArrays(1, &mesh->VAO);
+    glGenVertexArrays(1, &mesh->VAO);
     glBindVertexArray(mesh->VAO);
 
+    // Index Buffer Object
+    glGenBuffers(1, &mesh->IBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->IBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mesh->indices), mesh->indices, GL_STATIC_DRAW);
+
     // Vertex Buffer Object
-    glCreateBuffers(1, &(mesh->VBO));
-    // glGenBuffers(1, &mesh->VBO);
+    glGenBuffers(1, &mesh->VBO);
     glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * VERTEX_LIMIT, NULL, GL_DYNAMIC_DRAW);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * 8, mesh->vertices, GL_STATIC_DRAW);
 
     // Position (location = 0)
-    glEnableVertexArrayAttrib(mesh->VAO, 0);
-    // glEnableVertexAttribArray(0);
+    // glEnableVertexArrayAttrib(mesh->VAO, 0);
+    glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, position));
 
     // Normal (location = 1)
-    glEnableVertexArrayAttrib(mesh->VAO, 1);
-    // glEnableVertexAttribArray(1);
+    // glEnableVertexArrayAttrib(mesh->VAO, 1);
+    glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, normal));
-
-    // Index Buffer Object
-    glCreateBuffers(1, &(mesh->IBO));
-    // glGenBuffers(1, &mesh->IBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->IBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mesh->indices), mesh->indices, GL_STATIC_DRAW);
 
     return mesh;
 }
@@ -73,6 +69,8 @@ void destroyMesh(Mesh *mesh)
     glDeleteVertexArrays(1, &(mesh->VAO));
     glDeleteBuffers(1, &(mesh->VBO));
     glDeleteBuffers(1, &(mesh->IBO));
+    free(mesh->vertices);
+    free(mesh->indices);
     free(mesh);
 }
 
@@ -98,6 +96,20 @@ void computeModelMatrix(Model *model, mat4 *dest)
 void fakeLoad(Mesh *mesh)
 {
     Vertex vertices[8];
+
+    // glm_vec3_copy((vec3){0.5f, 0.5f, 0.0f}, vertices[0].position);
+    // glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, vertices[0].normal);
+
+    // glm_vec3_copy((vec3){0.5f, -0.5f, 0.0f}, vertices[1].position);
+    // glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, vertices[1].normal);
+
+    // glm_vec3_copy((vec3){-0.5f, -0.5f, 0.0f}, vertices[2].position);
+    // glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, vertices[2].normal);
+
+    // glm_vec3_copy((vec3){-0.5f, 0.5f, 0.0f}, vertices[3].position);
+    // glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, vertices[3].normal);
+
+    //
 
     glm_vec3_copy((vec3){-1.0f, -1.0f, -1.0f}, vertices[0].position);
     glm_vec3_copy((vec3){-1.0f, 0.0f, 0.0f}, vertices[0].normal);
@@ -126,7 +138,7 @@ void fakeLoad(Mesh *mesh)
     mesh->vertices = malloc(8 * sizeof(Vertex));
     memcpy(mesh->vertices, vertices, 8 * sizeof(Vertex));
 
-    unsigned int indices[] = {
+    GLuint indices[] = {
         0, 1, 2, 0, 2, 3, // Front face
         1, 5, 6, 1, 6, 2, // Right face
         5, 4, 7, 5, 7, 6, // Back face
@@ -135,6 +147,12 @@ void fakeLoad(Mesh *mesh)
         4, 5, 1, 4, 1, 0  // Bottom face
     };
 
-    mesh->indices = malloc(36 * sizeof(unsigned int));
-    memcpy(mesh->indices, indices, 36 * sizeof(unsigned int));
+    // GLuint indices[] = {
+    //     // note that we start from 0!
+    //     0, 1, 3, // first triangle
+    //     1, 2, 3  // second triangle
+    // };
+
+    mesh->indices = malloc(36 * sizeof(GLuint));
+    memcpy(mesh->indices, indices, 36 * sizeof(GLuint));
 }

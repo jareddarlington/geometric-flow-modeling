@@ -8,17 +8,21 @@
 
 void computeGeometry(GLFWwindow *window, Model *model)
 {
+    // printf("position | normal\n");
     // for (int i = 0; i < 8; i++)
-    //     printf("%f %f %f\n", model->mesh->vertices[i].position[0], model->mesh->vertices[i].position[1], model->mesh->vertices[i].position[2]);
-
-    // for (int i = 0; i < 8; i++)
-    //     printf("%f %f %f\n", model->mesh->vertices[i].normal[0], model->mesh->vertices[i].normal[1], model->mesh->vertices[i].normal[2]);
+    //     printf("%f %f %f | %f %f %f\n",
+    //            model->mesh->vertices[i].position[0],
+    //            model->mesh->vertices[i].position[1],
+    //            model->mesh->vertices[i].position[2],
+    //            model->mesh->vertices[i].normal[0],
+    //            model->mesh->vertices[i].normal[1],
+    //            model->mesh->vertices[i].normal[2]);
+    // printf("\n");
 
     // for (int i = 0; i < 36; i++)
-    //     printf("%d\n", model->mesh->indices[i]);
-    // printf("\n");
+    //     printf("%d ", model->mesh->indices[i]);
+    // printf("\n\n");
 
     glBindBuffer(GL_ARRAY_BUFFER, model->mesh->VBO);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(model->mesh->vertices), model->mesh->vertices);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
