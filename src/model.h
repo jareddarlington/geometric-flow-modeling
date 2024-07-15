@@ -10,7 +10,6 @@
 
 // Vertex management settings
 #define VERTEX_LIMIT 2000
-#define STRIDE 3
 
 // Model init settings
 #define INIT_MODEL_POSITION \
@@ -26,17 +25,17 @@
 
 typedef struct
 {
-    int v1, v2, v3; // indices of vertices in face (assumes face are triangular)
-} Face;
+    vec3 position;
+    vec3 normal;
+} Vertex;
 
 typedef struct
 {
-    int vertCount;   // number of vertices
-    float *vertices; // vertices
-    int faceCount;
-    Face *faces;
-    GLuint VAO; // vertex array object
-    GLuint VBO; // vertex buffer object
+    Vertex *vertices;      // vertices
+    unsigned int *indices; // indices
+    GLuint VAO;            // vertex array object
+    GLuint VBO;            // vertex buffer object
+    GLuint IBO;            // index buffer object
 } Mesh;
 
 typedef struct
@@ -47,11 +46,6 @@ typedef struct
     vec3 scale;          // scale
     GLuint renderMethod; // render method
 } Model;
-
-typedef struct
-{
-    float x, y, z;
-} Vertex;
 
 /*
  * Function Prototypes
@@ -72,14 +66,6 @@ Model *createModel(Mesh *mesh);
 void destroyModel(Model *model);
 
 /**
- * @brief Computes model matrix for use in MVP.
- *
- * @param model Model to generate matrix for.
- * @param dest  Destination of model matrix.
- */
-void computeModelMatrix(Model *model, mat4 *dest);
-
-/**
  * @brief Creates mesh and binds buffers.
  *
  * @param filename .obj filename.
@@ -94,21 +80,13 @@ Mesh *createMesh(const char *filename);
 void destroyMesh(Mesh *mesh);
 
 /**
- * @brief Parses and loads object.
+ * @brief Computes model matrix for use in MVP.
  *
- * @param filename .obj filename.
- * @param mesh     Mesh to load data into.
+ * @param model Model to generate matrix for.
+ * @param dest  Destination of model matrix.
  */
-void loadOBJ(const char *filename, Mesh *mesh);
+void computeModelMatrix(Model *model, mat4 *dest);
 
-/**
- * @brief Adds vertex data to dynamic arry.
- *
- * @param vertices   Dynamic Array to add to.
- * @param vertexData Vertex data.
- * @param v          Vertices.
- * @param vn         Normals of vertices.
- */
-void processVertex(DynamicArray *vertices, char *vertexData[3], Vertex v[], Vertex vn[]);
+void fakeLoad(Mesh *mesh);
 
 #endif

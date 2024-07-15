@@ -55,7 +55,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
  * Globals
  */
 
-enum cameraMode cMode = FREE;
+enum cameraMode cMode = ROTATE;
 
 int main(void)
 {
@@ -138,6 +138,9 @@ int main(void)
 
     while (!glfwWindowShouldClose(window))
     {
+        // Dynamically update geometry
+        computeGeometry(window, model);
+
         // Clear
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -157,9 +160,6 @@ int main(void)
             break;
         }
 
-        // geometric flow here i think
-        computeGeometry(window, model);
-
         // MVP
         computeModelMatrix(model, &modelMatrix);
         glm_mat4_mul(vp, modelMatrix, mvp);
@@ -167,7 +167,7 @@ int main(void)
 
         // Draw
         glBindVertexArray(model->mesh->VAO);
-        glDrawArrays(GL_TRIANGLES, 0, model->mesh->vertCount);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, NULL);
         glBindVertexArray(0);
 
         // Buffer swapping and event handling
@@ -175,6 +175,7 @@ int main(void)
         glfwPollEvents();
     }
 
+    destroyMesh(model->mesh);
     glfwTerminate();
     exit(EXIT_SUCCESS);
 }
