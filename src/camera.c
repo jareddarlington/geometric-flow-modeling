@@ -66,9 +66,11 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 vp)
     // Compute new orientation
     camera->yaw += MOUSE_SPEED * ((winWidth / 2) - xpos);
     camera->pitch += MOUSE_SPEED * ((winHeight / 2) - ypos);
+
+    // Clamp camera
     if (camera->pitch > M_PI_2)
         camera->pitch = M_PI_2;
-    if (camera->pitch < -M_PI_2)
+    else if (camera->pitch < -M_PI_2)
         camera->pitch = -M_PI_2;
 
     updateVectors(camera); // compute front, right, and up
@@ -141,6 +143,10 @@ void updateRotationCamera(GLFWwindow *window, Camera *camera, mat4 vp, Model *mo
         radius -= ZOOM_SPEED * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // out
         radius += ZOOM_SPEED * deltaTime;
+
+    // Clamp camera
+    if (radius < MIN_RADIUS)
+        radius = MIN_RADIUS;
 
     mat4 projection; // projection matrix
     mat4 view;       // camera matrix

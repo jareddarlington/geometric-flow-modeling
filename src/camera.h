@@ -19,12 +19,15 @@
 #define INIT_YAW 0               // camera inital yaw / horizontal angle
 #define INIT_PITCH 0             // camera inital pitch / vertical angle
 #define INIT_FOV 90              // camera init fov
-#define INIT_RADIUS 3.0f         // distance away from object in rotate mode
 
 // Camera settings
 #define ASPECT_RATIO 4.0f / 3.0f // camera aspect ratio
 #define NEAR_Z 0.1f              // near value for z buffer (clipping plane)
 #define FAR_Z 100.0f             // far value for z buffer (clipping plane)
+
+// Rotation camera settings
+#define INIT_RADIUS 3.0f // distance away from object in rotate mode
+#define MIN_RADIUS 1.0f  // minimum distance away from object
 
 /**
  * @brief Holds camera information.

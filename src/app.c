@@ -117,7 +117,7 @@ int main(void)
     // Shaders and meshes
     GLuint shaderProgram = createShaderProgram("./shaders/vertex.glsl", "./shaders/fragment.glsl");
 
-    Mesh *mesh = createMesh("models/icosphere.obj");
+    Mesh *mesh = createMesh("models/suzanne.obj");
     Model *model = createModel(mesh);
 
     // Transformations
