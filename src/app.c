@@ -15,9 +15,6 @@
 #include <stdio.h>
 
 // TODO: Fix camera turning away from object while going from rotate mode to free mode, I want the camera direction to be the same when transitioning
-// TODO: Look into VBO indexing
-// TODO: Base model color off of flow info
-// TODO: Look into more complex shading
 // TODO: Make readme and add info about each geometric flow and its algorithm
 
 /*
@@ -135,6 +132,8 @@ int main(void)
 
     while (!glfwWindowShouldClose(window))
     {
+        // TODO: Abstract this into geometry.c
+
         // Dynamically update geometry
         // for (size_t i = 0; i < mesh->numVertices; i++)
         // {

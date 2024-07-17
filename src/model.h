@@ -86,6 +86,12 @@ void destroyMesh(Mesh *mesh);
  */
 void computeModelMatrix(Model *model, mat4 *dest);
 
+/**
+ * @brief Loads .obj file into mesh.
+ *
+ * @param filename Name of file to load.
+ * @param mesh     Mesh to load data into.
+ */
 void loadOBJ(const char *filename, Mesh *mesh);
 
 #endif
