@@ -1,10 +1,9 @@
 #version 460 core
 
-in vec3 v_Normal;
+in vec3 fragNormal;
 
 out vec4 color;
 
-void main()
-{
-	color = vec4(0.553, 0.388, 0.722, 1.0);
+void main(){
+	color = vec4(fragNormal * 0.5 + 0.5, 1.0);
 }

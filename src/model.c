@@ -1,6 +1,9 @@
 #define GLAD_GL_IMPLEMENTATION
 #include <glad/glad.h>
 
+#define FAST_OBJ_IMPLEMENTATION
+#include "fast_obj.h"
+
 #include "model.h"
 #include "utils.h"
 
@@ -10,9 +13,6 @@
 #include <stddef.h>
 
 #include <cglm/cglm.h>
-
-// TODO: Keep track of faces for use in geometric flows (array or dynamic array or something else, this is a little bit tricky i think)
-// TODO: consider swaping to glDrawElements
 
 Model *createModel(Mesh *mesh)
 {
@@ -33,33 +33,31 @@ void destroyModel(Model *model)
 
 Mesh *createMesh(const char *filename)
 {
-    Mesh *mesh = malloc(sizeof(Mesh)); // allocate mesh memory
-    // loadOBJ(filename, mesh);
-    fakeLoad(mesh);
+    // Allocate memory for mesh
+    Mesh *mesh = malloc(sizeof(Mesh));
 
-    // Vertex Array Object
+    // OBJ
+    loadOBJ(filename, mesh);
+
+    // VAO
     glGenVertexArrays(1, &mesh->VAO);
     glBindVertexArray(mesh->VAO);
 
-    // Index Buffer Object
-    glGenBuffers(1, &mesh->IBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->IBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mesh->indices), mesh->indices, GL_STATIC_DRAW);
-
-    // Vertex Buffer Object
+    // VBO
     glGenBuffers(1, &mesh->VBO);
     glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * VERTEX_LIMIT, NULL, GL_DYNAMIC_DRAW);
 
-    // Position (location = 0)
-    // glEnableVertexArrayAttrib(mesh->VAO, 0);
-    glEnableVertexAttribArray(0);
+    // Attributes
+    glEnableVertexAttribArray(0); // position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, position));
-
-    // Normal (location = 1)
-    // glEnableVertexArrayAttrib(mesh->VAO, 1);
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(1); // normal
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, normal));
+
+    // IBO
+    glCreateBuffers(1, &mesh->IBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->IBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->numIndices * sizeof(uint32_t), mesh->indices, GL_STATIC_DRAW);
 
     return mesh;
 }
@@ -93,66 +91,41 @@ void computeModelMatrix(Model *model, mat4 *dest)
     glm_mat4_copy(modelMatrix, *dest); // copy over computed vp
 }
 
-void fakeLoad(Mesh *mesh)
+void loadOBJ(const char *filename, Mesh *mesh)
 {
-    Vertex vertices[8];
+    fastObjMesh *obj = fast_obj_read(filename);
+    if (!obj)
+    {
+        fprintf(stderr, "Error loading OBJ file: %s\n", filename);
+        exit(EXIT_FAILURE);
+    }
 
-    // glm_vec3_copy((vec3){0.5f, 0.5f, 0.0f}, vertices[0].position);
-    // glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, vertices[0].normal);
+    mesh->numVertices = obj->position_count;
+    mesh->numIndices = obj->face_count * 3; // Assuming triangles
 
-    // glm_vec3_copy((vec3){0.5f, -0.5f, 0.0f}, vertices[1].position);
-    // glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, vertices[1].normal);
+    // Allocate memory for vertices and normals
+    mesh->vertices = malloc(mesh->numVertices * sizeof(Vertex));
+    mesh->indices = malloc(mesh->numIndices * sizeof(uint32_t));
 
-    // glm_vec3_copy((vec3){-0.5f, -0.5f, 0.0f}, vertices[2].position);
-    // glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, vertices[2].normal);
+    // Copy vertices and normals
+    for (unsigned int i = 0; i < obj->position_count; ++i)
+    {
+        mesh->vertices[i].position[0] = obj->positions[3 * i + 0];
+        mesh->vertices[i].position[1] = obj->positions[3 * i + 1];
+        mesh->vertices[i].position[2] = obj->positions[3 * i + 2];
 
-    // glm_vec3_copy((vec3){-0.5f, 0.5f, 0.0f}, vertices[3].position);
-    // glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, vertices[3].normal);
+        mesh->vertices[i].normal[0] = obj->normals[3 * i + 0];
+        mesh->vertices[i].normal[1] = obj->normals[3 * i + 1];
+        mesh->vertices[i].normal[2] = obj->normals[3 * i + 2];
+    }
 
-    //
+    // Copy indices (converting to 0-based)
+    for (unsigned int i = 0; i < obj->face_count; ++i)
+    {
+        mesh->indices[3 * i + 0] = obj->indices[3 * i + 0].p;
+        mesh->indices[3 * i + 1] = obj->indices[3 * i + 1].p;
+        mesh->indices[3 * i + 2] = obj->indices[3 * i + 2].p;
+    }
 
-    glm_vec3_copy((vec3){-1.0f, -1.0f, -1.0f}, vertices[0].position);
-    glm_vec3_copy((vec3){-1.0f, 0.0f, 0.0f}, vertices[0].normal);
-
-    glm_vec3_copy((vec3){1.0f, -1.0f, -1.0f}, vertices[1].position);
-    glm_vec3_copy((vec3){1.0f, 0.0f, 0.0f}, vertices[1].normal);
-
-    glm_vec3_copy((vec3){1.0f, 1.0f, -1.0f}, vertices[2].position);
-    glm_vec3_copy((vec3){-0.0f, 1.0f, -0.0f}, vertices[2].normal);
-
-    glm_vec3_copy((vec3){-1.0f, 1.0f, -1.0f}, vertices[3].position);
-    glm_vec3_copy((vec3){0.0f, 1.0f, 0.0f}, vertices[3].normal);
-
-    glm_vec3_copy((vec3){-1.0f, -1.0f, 1.0f}, vertices[4].position);
-    glm_vec3_copy((vec3){0.0f, 0.0f, -1.0f}, vertices[4].normal);
-
-    glm_vec3_copy((vec3){1.0f, -1.0f, 1.0f}, vertices[5].position);
-    glm_vec3_copy((vec3){0.0f, 0.0f, 1.0f}, vertices[5].normal);
-
-    glm_vec3_copy((vec3){1.0f, 1.0f, 1.0f}, vertices[6].position);
-    glm_vec3_copy((vec3){0.0f, 0.0f, 1.0f}, vertices[6].normal);
-
-    glm_vec3_copy((vec3){-1.0f, 1.0f, 1.0f}, vertices[7].position);
-    glm_vec3_copy((vec3){0.0f, 0.0f, -1.0f}, vertices[7].normal);
-
-    mesh->vertices = malloc(8 * sizeof(Vertex));
-    memcpy(mesh->vertices, vertices, 8 * sizeof(Vertex));
-
-    GLuint indices[] = {
-        0, 1, 2, 0, 2, 3, // Front face
-        1, 5, 6, 1, 6, 2, // Right face
-        5, 4, 7, 5, 7, 6, // Back face
-        4, 0, 3, 4, 3, 7, // Left face
-        3, 2, 6, 3, 6, 7, // Top face
-        4, 5, 1, 4, 1, 0  // Bottom face
-    };
-
-    // GLuint indices[] = {
-    //     // note that we start from 0!
-    //     0, 1, 3, // first triangle
-    //     1, 2, 3  // second triangle
-    // };
-
-    mesh->indices = malloc(36 * sizeof(GLuint));
-    memcpy(mesh->indices, indices, 36 * sizeof(GLuint));
+    fast_obj_destroy(obj);
 }

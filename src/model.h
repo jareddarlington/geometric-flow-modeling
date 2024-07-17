@@ -9,7 +9,7 @@
 #include "utils.h"
 
 // Vertex management settings
-#define VERTEX_LIMIT 2000
+#define VERTEX_LIMIT 1000
 
 // Model init settings
 #define INIT_MODEL_POSITION \
@@ -31,11 +31,10 @@ typedef struct
 
 typedef struct
 {
-    Vertex *vertices; // vertices
-    GLuint *indices;  // indices
-    GLuint VAO;       // vertex array object
-    GLuint VBO;       // vertex buffer object
-    GLuint IBO;       // index buffer object
+    Vertex *vertices;
+    uint32_t *indices;
+    GLuint VAO, VBO, IBO;
+    size_t numIndices, numVertices;
 } Mesh;
 
 typedef struct
@@ -87,6 +86,6 @@ void destroyMesh(Mesh *mesh);
  */
 void computeModelMatrix(Model *model, mat4 *dest);
 
-void fakeLoad(Mesh *mesh);
+void loadOBJ(const char *filename, Mesh *mesh);
 
 #endif

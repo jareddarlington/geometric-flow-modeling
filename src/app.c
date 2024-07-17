@@ -7,7 +7,6 @@
 #include "shader.h"
 #include "camera.h"
 #include "model.h"
-#include "geometry.h"
 
 #include <cglm/cglm.h>
 
@@ -112,7 +111,7 @@ int main(void)
     glEnable(GL_DEPTH_TEST);                       // enable depth test (z-buffer)
     glDepthFunc(GL_LESS);                          // use fragment closer to the camera
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);     // enable polygon mode globally
-    // glEnable(GL_CULL_FACE);                        // enable face culling (skips rendering non-visible polygons)
+    glEnable(GL_CULL_FACE);                        // enable face culling (skips rendering non-visible polygons)
 
     /*
      * Initialization
@@ -121,16 +120,14 @@ int main(void)
     // Shaders and meshes
     GLuint shaderProgram = createShaderProgram("./shaders/vertex.glsl", "./shaders/fragment.glsl");
 
-    Mesh *mesh = createMesh("models/cube.obj");
+    Mesh *mesh = createMesh("models/icosphere.obj");
     Model *model = createModel(mesh);
 
-    // MVP matrix
+    // Transformations
+    Camera *camera = createCamera(window);
     mat4 modelMatrix;
     mat4 vp;
     mat4 mvp;
-
-    // Create camera
-    Camera *camera = createCamera(window);
 
     /*
      * Rendering Loop
@@ -139,9 +136,13 @@ int main(void)
     while (!glfwWindowShouldClose(window))
     {
         // Dynamically update geometry
-        // computeGeometry(window, model);
-        glBindBuffer(GL_ARRAY_BUFFER, model->mesh->VBO);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(model->mesh->vertices), model->mesh->vertices);
+        // for (size_t i = 0; i < mesh->numVertices; i++)
+        // {
+        //     glm_vec3_add((vec3){0.01f, 0.0f, 0.0f}, mesh->vertices[i].position, mesh->vertices[i].position);
+        //     glm_vec3_add((vec3){0.0f, 0.001f, 0.0f}, mesh->vertices[i].normal, mesh->vertices[i].normal);
+        // }
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, mesh->numVertices * sizeof(Vertex), mesh->vertices);
 
         // Clear
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -168,9 +169,8 @@ int main(void)
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "MVP"), 1, GL_FALSE, &mvp[0][0]);
 
         // Draw
-        glBindVertexArray(model->mesh->VAO);
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, NULL);
-        glBindVertexArray(0);
+        glBindVertexArray(mesh->VAO);
+        glDrawElements(GL_TRIANGLES, mesh->numIndices, GL_UNSIGNED_INT, NULL);
 
         // Buffer swapping and event handling
         glfwSwapBuffers(window);
