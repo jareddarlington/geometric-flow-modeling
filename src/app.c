@@ -7,6 +7,7 @@
 #include "shader.h"
 #include "camera.h"
 #include "model.h"
+#include "geometry.h"
 
 #include <cglm/cglm.h>
 
@@ -32,12 +33,12 @@
  * Enums
  */
 
-enum cameraMode
+typedef enum
 {
     ROTATE,
     FREE,
     LOCK
-};
+} CAMERA_MODE;
 
 /*
  * Function Prototypes
@@ -51,7 +52,8 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
  * Globals
  */
 
-enum cameraMode cMode = ROTATE;
+CAMERA_MODE cMode = FREE;  // initial camera mode
+GEOMETRIC_FLOW flow = MCF; // geometric flow to compute
 
 int main(void)
 {
@@ -108,7 +110,7 @@ int main(void)
     glEnable(GL_DEPTH_TEST);                       // enable depth test (z-buffer)
     glDepthFunc(GL_LESS);                          // use fragment closer to the camera
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);     // enable polygon mode globally
-    glEnable(GL_CULL_FACE);                        // enable face culling (skips rendering non-visible polygons)
+    // glEnable(GL_CULL_FACE);                        // enable face culling (skips rendering non-visible polygons)
 
     /*
      * Initialization
@@ -117,7 +119,7 @@ int main(void)
     // Shaders and meshes
     GLuint shaderProgram = createShaderProgram("./shaders/vertex.glsl", "./shaders/fragment.glsl");
 
-    Mesh *mesh = createMesh("models/suzanne.obj");
+    Mesh *mesh = createMesh("models/icosphere.obj");
     Model *model = createModel(mesh);
 
     // Transformations
@@ -132,16 +134,8 @@ int main(void)
 
     while (!glfwWindowShouldClose(window))
     {
-        // TODO: Abstract this into geometry.c
-
         // Dynamically update geometry
-        // for (size_t i = 0; i < mesh->numVertices; i++)
-        // {
-        //     glm_vec3_add((vec3){0.01f, 0.0f, 0.0f}, mesh->vertices[i].position, mesh->vertices[i].position);
-        //     glm_vec3_add((vec3){0.0f, 0.001f, 0.0f}, mesh->vertices[i].normal, mesh->vertices[i].normal);
-        // }
-        glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, mesh->numVertices * sizeof(Vertex), mesh->vertices);
+        computeGeometry(window, model, flow);
 
         // Clear
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -168,8 +162,8 @@ int main(void)
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "MVP"), 1, GL_FALSE, &mvp[0][0]);
 
         // Draw
-        glBindVertexArray(mesh->VAO);
-        glDrawElements(GL_TRIANGLES, mesh->numIndices, GL_UNSIGNED_INT, NULL);
+        glBindVertexArray(model->mesh->VAO);
+        glDrawElements(model->renderMethod, model->mesh->numIndices, GL_UNSIGNED_INT, NULL);
 
         // Buffer swapping and event handling
         glfwSwapBuffers(window);
