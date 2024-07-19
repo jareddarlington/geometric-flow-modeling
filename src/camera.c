@@ -43,7 +43,7 @@ void updateVectors(Camera *camera)
     glm_vec3_cross(camera->right, camera->front, camera->up);
 }
 
-void updateCamera(GLFWwindow *window, Camera *camera, mat4 vp)
+void updateCamera(GLFWwindow *window, Camera *camera, mat4 pDest, mat4 vDest)
 {
     static double lastTime = 0.0; // init time (first function call)
 
@@ -103,7 +103,6 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 vp)
 
     mat4 projection; // projection matrix
     mat4 view;       // camera matrix
-    mat4 tempVP;     // temporary VP
 
     vec3 posDestTemp;
     glm_vec3_add(camera->position, camera->front, posDestTemp);
@@ -113,14 +112,15 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 vp)
                posDestTemp,                                                         // direction
                camera->up,                                                          // up
                view);                                                               // destination
-    glm_mat4_mul(projection, view, tempVP);                                         // VP = projection * view
 
-    glm_mat4_copy(tempVP, vp); // copy over computed vp
+    // Copy over matrices
+    glm_mat4_copy(projection, pDest);
+    glm_mat4_copy(view, vDest);
 
     lastTime = currentTime; // update last time taken
 }
 
-void updateRotationCamera(GLFWwindow *window, Camera *camera, mat4 vp, Model *model)
+void updateRotationCamera(GLFWwindow *window, Camera *camera, Model *model, mat4 pDest, mat4 vDest)
 {
     static float radius = INIT_RADIUS; // distance away from object
 
@@ -144,22 +144,18 @@ void updateRotationCamera(GLFWwindow *window, Camera *camera, mat4 vp, Model *mo
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // out
         radius += ZOOM_SPEED * deltaTime;
 
-    // Clamp camera
-    if (radius < MIN_RADIUS)
-        radius = MIN_RADIUS;
-
     mat4 projection; // projection matrix
     mat4 view;       // camera matrix
-    mat4 tempVP;     // temporary VP
 
     glm_perspective(glm_rad(camera->fov), ASPECT_RATIO, NEAR_Z, FAR_Z, projection); // fov, aspect ratio, near value, far value, destination
     glm_lookat(camera->position,                                                    // camera position (world space)
                model->position,                                                     // direction
                camera->up,                                                          // up
                view);                                                               // destination
-    glm_mat4_mul(projection, view, tempVP);                                         // VP = projection * view
 
-    glm_mat4_copy(tempVP, vp); // copy over computed vp
+    // Copy over matrices
+    glm_mat4_copy(projection, pDest);
+    glm_mat4_copy(view, vDest);
 
     lastTime = currentTime; // update last time taken
 }

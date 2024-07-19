@@ -7,10 +7,15 @@
 #include "geometry.h"
 #include "model.h"
 
-void computeGeometry(GLFWwindow *window, Model *model, GEOMETRIC_FLOW flow)
+void computeGeometry(GLFWwindow *window, Model *model, GEOMETRIC_FLOW flow, bool flowing)
 {
-    if (flow == MCF)
-        meanCurvatureFlow(model->mesh);
+    if (flowing)
+    {
+        if (flow == MCF)
+        {
+            meanCurvatureFlow(model->mesh);
+        }
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, model->mesh->VBO);
     glBufferSubData(GL_ARRAY_BUFFER, 0, model->mesh->numVertices * sizeof(Vertex), model->mesh->vertices);
@@ -18,14 +23,27 @@ void computeGeometry(GLFWwindow *window, Model *model, GEOMETRIC_FLOW flow)
 
 void meanCurvatureFlow(Mesh *mesh)
 {
-    computeNormals(mesh);
-    vec3 *H;
-    computeMeanCurvature(mesh, H);
+    static double lastTime = 0.0;
+    if (lastTime == 0.0)
+        lastTime = glfwGetTime();
+    double currentTime = glfwGetTime();
+    float deltaTime = (float)(currentTime - lastTime);
+
+    computeMeanCurvature(mesh);
+    for (size_t i = 0; i < mesh->numVertices; i++)
+    {
+        vec3 temp;
+        glm_vec3_scale(mesh->vertices[i].curvature, deltaTime * mesh->numVertices, temp);
+        glm_vec3_add(mesh->vertices[i].position, temp, mesh->vertices[i].position);
+        // printf("%f %f %f\n", mesh->vertices[i].curvature[0], mesh->vertices[i].curvature[1], mesh->vertices[i].curvature[2]);
+    }
+    // printf("\n");
+
+    lastTime = currentTime;
 }
 
 void computeNormals(Mesh *mesh)
 {
-    // Set all vertex normals to 0
     for (size_t i = 0; i < mesh->numVertices; i++)
         glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, mesh->vertices[i].normal);
 
@@ -62,14 +80,13 @@ void computeNormals(Mesh *mesh)
         glm_vec3_normalize(mesh->vertices[i].normal);
 }
 
-void computeMeanCurvature(Mesh *mesh, vec3 *dest)
+void computeMeanCurvature(Mesh *mesh)
 {
     // Initalize mean curvatures and voronoi areas
-    vec3 H[mesh->numVertices];
     float areas[mesh->numVertices];
     for (size_t i = 0; i < mesh->numVertices; i++)
     {
-        glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, H[i]);
+        glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, mesh->vertices[i].curvature);
         areas[i] = 0.0f;
     }
 
@@ -97,24 +114,50 @@ void computeMeanCurvature(Mesh *mesh, vec3 *dest)
         float cotBeta = 1 / tan(beta);
         float cotGamma = 1 / tan(gamma);
 
-        // Update mean curvatures
+        // Update curvatures
         vec3 temp;
 
+        // v1 curvature
+        glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, temp);
         glm_vec3_sub(mesh->vertices[v2Index].position, mesh->vertices[v1Index].position, temp);
         glm_vec3_scale(temp, cotBeta + cotGamma, temp);
-        glm_vec3_add(H[v1Index], temp, H[v1Index]);
+        glm_vec3_add(mesh->vertices[v1Index].curvature, temp, mesh->vertices[v1Index].curvature);
 
-        glm_vec3_sub(mesh->vertices[v3Index].position, mesh->vertices[v2Index].position, temp);
+        glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, temp);
+        glm_vec3_sub(mesh->vertices[v3Index].position, mesh->vertices[v1Index].position, temp);
         glm_vec3_scale(temp, cotAlpha + cotGamma, temp);
-        glm_vec3_add(H[v2Index], temp, H[v2Index]);
+        glm_vec3_add(mesh->vertices[v1Index].curvature, temp, mesh->vertices[v1Index].curvature);
 
+        // v2 curvature
+        glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, temp);
+        glm_vec3_sub(mesh->vertices[v1Index].position, mesh->vertices[v2Index].position, temp);
+        glm_vec3_scale(temp, cotAlpha + cotGamma, temp);
+        glm_vec3_add(mesh->vertices[v2Index].curvature, temp, mesh->vertices[v2Index].curvature);
+
+        glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, temp);
+        glm_vec3_sub(mesh->vertices[v3Index].position, mesh->vertices[v2Index].position, temp);
+        glm_vec3_scale(temp, cotBeta + cotAlpha, temp);
+        glm_vec3_add(mesh->vertices[v2Index].curvature, temp, mesh->vertices[v2Index].curvature);
+
+        // v3 curvature
+        glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, temp);
         glm_vec3_sub(mesh->vertices[v1Index].position, mesh->vertices[v3Index].position, temp);
         glm_vec3_scale(temp, cotAlpha + cotBeta, temp);
-        glm_vec3_add(H[v3Index], temp, H[v3Index]);
+        glm_vec3_add(mesh->vertices[v3Index].curvature, temp, mesh->vertices[v3Index].curvature);
 
-        // Update voronoi areas
+        glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, temp);
+        glm_vec3_sub(mesh->vertices[v2Index].position, mesh->vertices[v3Index].position, temp);
+        glm_vec3_scale(temp, cotBeta + cotGamma, temp);
+        glm_vec3_add(mesh->vertices[v3Index].curvature, temp, mesh->vertices[v3Index].curvature);
+
+        // Calculate face edges
+        vec3 e1, e2;
+        glm_vec3_sub(v2, v1, e1);
+        glm_vec3_sub(v3, v1, e2);
+
+        // Calculate face normal
         vec3 faceNormal;
-        computeFaceNormal(v1, v2, v3, faceNormal);
+        glm_vec3_crossn(e1, e2, faceNormal);
         float faceArea = glm_vec3_norm(faceNormal) / 2;
 
         areas[v1Index] += faceArea / 3;
@@ -124,9 +167,7 @@ void computeMeanCurvature(Mesh *mesh, vec3 *dest)
 
     // Normalize mean curvature by area
     for (size_t i = 0; i < mesh->numVertices; i++)
-        glm_vec3_divs(H[i], 2 * areas[i], H[i]);
-
-    dest = H;
+        glm_vec3_divs(mesh->vertices[i].curvature, 2 * areas[i], mesh->vertices[i].curvature);
 }
 
 float computeOppositeAngle(vec3 v1, vec3 v2, vec3 v3)
@@ -135,19 +176,4 @@ float computeOppositeAngle(vec3 v1, vec3 v2, vec3 v3)
     glm_vec3_sub(v2, v1, e1);
     glm_vec3_sub(v3, v1, e2);
     return acos(glm_vec3_dot(e1, e2) / glm_vec3_norm(e1) * glm_vec3_norm(e2));
-}
-
-void computeFaceNormal(vec3 v1, vec3 v2, vec3 v3, vec3 *dest)
-{
-    // Calculate face edges
-    vec3 e1, e2;
-    glm_vec3_sub(v2, v1, e1);
-    glm_vec3_sub(v3, v1, e2);
-
-    // Calculate face normal
-    vec3 faceNormal;
-    glm_vec3_crossn(e1, e2, faceNormal);
-
-    // Copy over normal
-    glm_vec3_copy(faceNormal, dest);
 }

@@ -9,7 +9,7 @@
 #include "utils.h"
 
 // Vertex management settings
-#define VERTEX_LIMIT 1000
+#define VERTEX_LIMIT 3000
 
 // Model init settings
 #define INIT_MODEL_POSITION \
@@ -27,6 +27,7 @@ typedef struct
 {
     vec3 position;
     vec3 normal;
+    vec3 curvature;
 } Vertex;
 
 typedef struct

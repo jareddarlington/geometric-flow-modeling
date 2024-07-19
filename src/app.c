@@ -17,6 +17,7 @@
 
 // TODO: Fix camera turning away from object while going from rotate mode to free mode, I want the camera direction to be the same when transitioning
 // TODO: Make readme and add info about each geometric flow and its algorithm
+// TODO: seperate m, v, and p matrices until shader compilation
 
 /*
  * Constants
@@ -54,6 +55,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
 CAMERA_MODE cMode = FREE;  // initial camera mode
 GEOMETRIC_FLOW flow = MCF; // geometric flow to compute
+bool flowing = false;
 
 int main(void)
 {
@@ -119,14 +121,14 @@ int main(void)
     // Shaders and meshes
     GLuint shaderProgram = createShaderProgram("./shaders/vertex.glsl", "./shaders/fragment.glsl");
 
-    Mesh *mesh = createMesh("models/icosphere.obj");
+    Mesh *mesh = createMesh("models/high_density_icosphere.obj");
     Model *model = createModel(mesh);
 
     // Transformations
     Camera *camera = createCamera(window);
-    mat4 modelMatrix;
-    mat4 vp;
-    mat4 mvp;
+    mat4 m;
+    mat4 v;
+    mat4 p;
 
     /*
      * Rendering Loop
@@ -135,7 +137,7 @@ int main(void)
     while (!glfwWindowShouldClose(window))
     {
         // Dynamically update geometry
-        computeGeometry(window, model, flow);
+        computeGeometry(window, model, flow, flowing);
 
         // Clear
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -147,19 +149,20 @@ int main(void)
         switch (cMode)
         {
         case ROTATE:
-            updateRotationCamera(window, camera, vp, model);
+            updateRotationCamera(window, camera, model, p, v);
             break;
         case FREE:
-            updateCamera(window, camera, vp);
+            updateCamera(window, camera, p, v);
             break;
         case LOCK:
             break;
         }
 
         // MVP
-        computeModelMatrix(model, &modelMatrix);
-        glm_mat4_mul(vp, modelMatrix, mvp);
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "MVP"), 1, GL_FALSE, &mvp[0][0]);
+        computeModelMatrix(model, &m);
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, &m[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, &v[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, &p[0][0]);
 
         // Draw
         glBindVertexArray(model->mesh->VAO);
@@ -218,6 +221,8 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
             break;
         }
     }
+    if (key == GLFW_KEY_F && action == GLFW_PRESS)
+        flowing = !flowing;
 }
 
 /**

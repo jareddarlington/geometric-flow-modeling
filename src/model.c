@@ -9,8 +9,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #include <stddef.h>
+#include <string.h>
 
 #include <cglm/cglm.h>
 
@@ -53,6 +53,8 @@ Mesh *createMesh(const char *filename)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, position));
     glEnableVertexAttribArray(1); // normal
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, normal));
+    glEnableVertexAttribArray(2); // curvature
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, curvature));
 
     // IBO
     glCreateBuffers(1, &mesh->IBO);
@@ -101,7 +103,7 @@ void loadOBJ(const char *filename, Mesh *mesh)
     }
 
     mesh->numVertices = obj->position_count;
-    mesh->numIndices = obj->face_count * 3; // Assuming triangles
+    mesh->numIndices = obj->face_count * 3;
 
     // Allocate memory for vertices and normals
     mesh->vertices = malloc(mesh->numVertices * sizeof(Vertex));
@@ -113,10 +115,6 @@ void loadOBJ(const char *filename, Mesh *mesh)
         mesh->vertices[i].position[0] = obj->positions[3 * i + 0];
         mesh->vertices[i].position[1] = obj->positions[3 * i + 1];
         mesh->vertices[i].position[2] = obj->positions[3 * i + 2];
-
-        mesh->vertices[i].normal[0] = obj->normals[3 * i + 0];
-        mesh->vertices[i].normal[1] = obj->normals[3 * i + 1];
-        mesh->vertices[i].normal[2] = obj->normals[3 * i + 2];
     }
 
     // Copy indices (converting to 0-based)
@@ -125,6 +123,13 @@ void loadOBJ(const char *filename, Mesh *mesh)
         mesh->indices[3 * i + 0] = obj->indices[3 * i + 0].p;
         mesh->indices[3 * i + 1] = obj->indices[3 * i + 1].p;
         mesh->indices[3 * i + 2] = obj->indices[3 * i + 2].p;
+    }
+
+    // Initalize all normals and curvatures to 0
+    for (size_t i = 0; i < mesh->numVertices; i++)
+    {
+        glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, mesh->vertices[i].normal);
+        glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, mesh->vertices[i].curvature);
     }
 
     fast_obj_destroy(obj);

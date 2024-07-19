@@ -8,6 +8,8 @@
 
 #include <cglm/cglm.h>
 
+// TODO: update docs
+
 // Movement settings
 #define SPEED 5.0f         // camera movement speed
 #define MOUSE_SPEED 0.005f // turn / look speed
@@ -19,15 +21,12 @@
 #define INIT_YAW 0               // camera inital yaw / horizontal angle
 #define INIT_PITCH 0             // camera inital pitch / vertical angle
 #define INIT_FOV 90              // camera init fov
+#define INIT_RADIUS 3.0f         // distance away from object in rotate mode
 
 // Camera settings
 #define ASPECT_RATIO 4.0f / 3.0f // camera aspect ratio
 #define NEAR_Z 0.1f              // near value for z buffer (clipping plane)
 #define FAR_Z 100.0f             // far value for z buffer (clipping plane)
-
-// Rotation camera settings
-#define INIT_RADIUS 3.0f // distance away from object in rotate mode
-#define MIN_RADIUS 1.0f  // minimum distance away from object
 
 /**
  * @brief Holds camera information.
@@ -68,7 +67,7 @@ void updateVectors(Camera *camera);
  * @param camera Camera to update and read from.
  * @param vp     VP matrix to update.
  */
-void updateCamera(GLFWwindow *window, Camera *camera, mat4 vp);
+void updateCamera(GLFWwindow *window, Camera *camera, mat4 pDest, mat4 vDest);
 
 /**
  * @brief Recomputes VP based on user input, time, and model info.
@@ -78,6 +77,6 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 vp);
  * @param vp     VP matrix to update.
  * @param model  Model to rotate around.
  */
-void updateRotationCamera(GLFWwindow *window, Camera *camera, mat4 vp, Model *model);
+void updateRotationCamera(GLFWwindow *window, Camera *camera, Model *model, mat4 pDest, mat4 vDest);
 
 #endif
