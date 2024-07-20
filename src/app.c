@@ -126,9 +126,7 @@ int main(void)
 
     // Transformations
     Camera *camera = createCamera(window);
-    mat4 m;
-    mat4 v;
-    mat4 p;
+    mat4 m, v, p;
 
     /*
      * Rendering Loop

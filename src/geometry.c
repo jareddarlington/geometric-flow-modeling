@@ -35,7 +35,7 @@ void meanCurvatureFlow(Mesh *mesh)
         vec3 temp;
         glm_vec3_scale(mesh->vertices[i].curvature, deltaTime * mesh->numVertices, temp);
         glm_vec3_add(mesh->vertices[i].position, temp, mesh->vertices[i].position);
-        // printf("%f %f %f\n", mesh->vertices[i].curvature[0], mesh->vertices[i].curvature[1], mesh->vertices[i].curvature[2]);
+        // printf("%f %f %f\n", mesh-   >vertices[i].curvature[0], mesh->vertices[i].curvature[1], mesh->vertices[i].curvature[2]);
     }
     // printf("\n");
 
@@ -86,7 +86,7 @@ void computeMeanCurvature(Mesh *mesh)
     float areas[mesh->numVertices];
     for (size_t i = 0; i < mesh->numVertices; i++)
     {
-        glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, mesh->vertices[i].curvature);
+        // glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, mesh->vertices[i].curvature);
         areas[i] = 0.0f;
     }
 
