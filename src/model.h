@@ -9,7 +9,7 @@
 #include "utils.h"
 
 // Vertex management settings
-#define VERTEX_LIMIT 3000
+#define VERTEX_LIMIT 5000
 
 // Model init settings
 #define INIT_MODEL_POSITION \

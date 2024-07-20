@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 // TODO: Slow rotation speed
+// TODO: fix rotation height, angle, etc...
 
 Camera *createCamera(GLFWwindow *window)
 {
@@ -22,6 +23,7 @@ Camera *createCamera(GLFWwindow *window)
     camera->pitch = INIT_PITCH;
     camera->fov = INIT_FOV;
     updateVectors(camera);
+    camera->speed = INIT_SPEED;
     return camera;
 };
 
@@ -75,29 +77,41 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 pDest, mat4 vDest)
 
     updateVectors(camera); // compute front, right, and up
 
+    // UP/DOWN speed change
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+        camera->speed += 0.1f;
+    else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        camera->speed -= 0.1f;
+
+    // Clamp speed
+    if (camera->speed > 5.0f)
+        camera->speed = 5.0f;
+    if (camera->speed < 0.5f)
+        camera->speed = 0.5f;
+
     // WASD movement
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // forward
     {
         vec3 temp;
-        glm_vec3_scale(camera->front, deltaTime * SPEED, temp);
+        glm_vec3_scale(camera->front, deltaTime * camera->speed, temp);
         glm_vec3_add(camera->position, temp, camera->position);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // back
     {
         vec3 temp;
-        glm_vec3_scale(camera->front, deltaTime * SPEED, temp);
+        glm_vec3_scale(camera->front, deltaTime * camera->speed, temp);
         glm_vec3_sub(camera->position, temp, camera->position);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) // right
     {
         vec3 temp;
-        glm_vec3_scale(camera->right, deltaTime * SPEED, temp);
+        glm_vec3_scale(camera->right, deltaTime * camera->speed, temp);
         glm_vec3_add(camera->position, temp, camera->position);
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // left
     {
         vec3 temp;
-        glm_vec3_scale(camera->right, deltaTime * SPEED, temp);
+        glm_vec3_scale(camera->right, deltaTime * camera->speed, temp);
         glm_vec3_sub(camera->position, temp, camera->position);
     }
 
