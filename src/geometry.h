@@ -1,12 +1,14 @@
 #include "model.h"
 
+// TODO: update docs
+
 typedef enum
 {
-    MCF // mean curvature flow
+    MCF_VBM, // mean curvature flow (vertex-based method)
+    MCF_ITI  // mean curvature flow (implicit time integration)
 } GEOMETRIC_FLOW;
 
 void computeGeometry(GLFWwindow *window, Model *model, GEOMETRIC_FLOW flow, bool flowing);
-void meanCurvatureFlow(Mesh *mesh);
+void mcfVBM(Mesh *mesh);
+void mcfITI(Mesh *mesh);
 void computeNormals(Mesh *mesh);
-void computeMeanCurvature(Mesh *mesh);
-float computeOppositeAngle(vec3 v1, vec3 v2, vec3 v3);

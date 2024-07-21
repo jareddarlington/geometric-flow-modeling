@@ -17,7 +17,7 @@
 
 // TODO: Fix camera turning away from object while going from rotate mode to free mode, I want the camera direction to be the same when transitioning
 // TODO: Make readme and add info about each geometric flow and its algorithm
-// TODO: seperate m, v, and p matrices until shader compilation
+// TODO: Add options to export shapes
 
 /*
  * Constants
@@ -53,8 +53,8 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
  * Globals
  */
 
-CAMERA_MODE cMode = FREE;  // initial camera mode
-GEOMETRIC_FLOW flow = MCF; // geometric flow to compute
+CAMERA_MODE cMode = FREE;      // initial camera mode
+GEOMETRIC_FLOW flow = MCF_VBM; // geometric flow to compute
 bool flowing = false;
 
 int main(void)
@@ -121,7 +121,7 @@ int main(void)
     // Shaders and meshes
     GLuint shaderProgram = createShaderProgram("./shaders/vertex.glsl", "./shaders/fragment.glsl");
 
-    Mesh *mesh = createMesh("models/high_density_icosphere.obj");
+    Mesh *mesh = createMesh("models/suzanne.obj");
     Model *model = createModel(mesh);
 
     // Transformations

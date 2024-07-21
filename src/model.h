@@ -25,9 +25,9 @@
 
 typedef struct
 {
-    vec3 position;
-    vec3 normal;
-    vec3 curvature;
+    vec3 position;  // vertex's position
+    vec3 normal;    // vertex's normal
+    vec3 curvature; // discrete analogue to curvature or vector of flow movement
 } Vertex;
 
 typedef struct
