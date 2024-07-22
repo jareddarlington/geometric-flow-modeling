@@ -16,7 +16,7 @@
 #include <stdio.h>
 
 // TODO: Fix camera turning away from object while going from rotate mode to free mode, I want the camera direction to be the same when transitioning
-// TODO: Make readme and add info about each geometric flow and its algorithm
+// TODO: Make readme and add info about each geometric flow and its algorithm and tutorial on how to use your own objs
 // TODO: Add options to export shapes
 
 /*
@@ -111,8 +111,8 @@ int main(void)
     glClearColor(0.1686f, 0.1608f, 0.1686f, 1.0f); // set background colors
     glEnable(GL_DEPTH_TEST);                       // enable depth test (z-buffer)
     glDepthFunc(GL_LESS);                          // use fragment closer to the camera
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);     // enable polygon mode globally
-    // glEnable(GL_CULL_FACE);                        // enable face culling (skips rendering non-visible polygons)
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);     // enable polygon mode globally
+    // glEnable(GL_CULL_FACE); // enable face culling (skips rendering non-visible polygons)
 
     /*
      * Initialization
@@ -121,7 +121,7 @@ int main(void)
     // Shaders and meshes
     GLuint shaderProgram = createShaderProgram("./shaders/vertex.glsl", "./shaders/fragment.glsl");
 
-    Mesh *mesh = createMesh("models/suzanne.obj");
+    Mesh *mesh = createMesh("models/voronoi_cube.obj");
     Model *model = createModel(mesh);
 
     // Transformations

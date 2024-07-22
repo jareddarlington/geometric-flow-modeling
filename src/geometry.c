@@ -27,17 +27,18 @@ void computeGeometry(GLFWwindow *window, Model *model, GEOMETRIC_FLOW flow, bool
 
 void mcfVBM(Mesh *mesh)
 {
+    // Calculate change in time
     static double lastTime = 0.0;
     if (lastTime == 0.0)
         lastTime = glfwGetTime();
     double currentTime = glfwGetTime();
     float deltaTime = (float)(currentTime - lastTime);
 
+    // Reset all curvature to 0
     for (size_t i = 0; i < mesh->numVertices; i++)
-    {
         glm_vec3_zero(mesh->vertices[i].curvature);
-    }
 
+    // Calculate curvature
     for (size_t i = 0; i < mesh->numIndices; i += 3)
     {
         uint32_t v0 = mesh->indices[i];
@@ -63,14 +64,13 @@ void mcfVBM(Mesh *mesh)
 
     for (size_t i = 0; i < mesh->numVertices; i++)
     {
-        glm_vec3_scale(mesh->vertices[i].curvature, 1.0f / 3.0f, mesh->vertices[i].curvature);
-    }
-
-    for (size_t i = 0; i < mesh->numVertices; i++)
-    {
+        // Update positions based on curvature
         vec3 update;
-        glm_vec3_scale(mesh->vertices[i].curvature, deltaTime, update);
+        glm_vec3_scale(mesh->vertices[i].curvature, deltaTime * 10, update);
         glm_vec3_add(mesh->vertices[i].position, update, mesh->vertices[i].position);
+
+        // Scale curvature for heat map coloring
+        glm_vec3_scale(mesh->vertices[i].curvature, 100.0f, mesh->vertices[i].curvature);
     }
 
     lastTime = currentTime;
