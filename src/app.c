@@ -18,7 +18,7 @@
 // TODO: Fix camera turning away from object while going from rotate mode to free mode, I want the camera direction to be the same when transitioning
 // TODO: Make readme and add info about each geometric flow and its algorithm and tutorial on how to use your own objs
 // TODO: Add options to export shapes
-// TODO: add grid
+// TODO: Add grid
 
 /*
  * Constants

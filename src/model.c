@@ -13,6 +13,8 @@
 
 #include <cglm/cglm.h>
 
+// TODO: Refactor and comment / document
+
 Model *createModel(Mesh *mesh)
 {
     Model *model = malloc(sizeof(Model));                // allocate model memory
@@ -124,12 +126,41 @@ void loadOBJ(const char *filename, Mesh *mesh)
         mesh->indices[3 * i + 2] = obj->indices[3 * i + 2].p;
     }
 
-    // Initalize all normals and curvatures to 0
+    // Initialize normals and curvatures
     for (size_t i = 0; i < mesh->numVertices; i++)
-    {
-        glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, mesh->vertices[i].normal);
-        glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, mesh->vertices[i].curvature);
-    }
+        glm_vec3_zero(mesh->vertices[i].normal);
+    initCurvature(mesh);
 
     fast_obj_destroy(obj);
+}
+
+void initCurvature(Mesh *mesh)
+{
+    // Calculate initial mean curvature vectors
+    for (size_t i = 0; i < mesh->numIndices; i += 3)
+    {
+        uint32_t v0 = mesh->indices[i];
+        uint32_t v1 = mesh->indices[i + 1];
+        uint32_t v2 = mesh->indices[i + 2];
+
+        vec3 diff;
+        glm_vec3_sub(mesh->vertices[v1].position, mesh->vertices[v0].position, diff);
+        glm_vec3_add(mesh->vertices[v0].curvature, diff, mesh->vertices[v0].curvature);
+        glm_vec3_sub(mesh->vertices[v0].position, mesh->vertices[v1].position, diff);
+        glm_vec3_add(mesh->vertices[v1].curvature, diff, mesh->vertices[v1].curvature);
+
+        glm_vec3_sub(mesh->vertices[v2].position, mesh->vertices[v1].position, diff);
+        glm_vec3_add(mesh->vertices[v1].curvature, diff, mesh->vertices[v1].curvature);
+        glm_vec3_sub(mesh->vertices[v1].position, mesh->vertices[v2].position, diff);
+        glm_vec3_add(mesh->vertices[v2].curvature, diff, mesh->vertices[v2].curvature);
+
+        glm_vec3_sub(mesh->vertices[v0].position, mesh->vertices[v2].position, diff);
+        glm_vec3_add(mesh->vertices[v2].curvature, diff, mesh->vertices[v2].curvature);
+        glm_vec3_sub(mesh->vertices[v2].position, mesh->vertices[v0].position, diff);
+        glm_vec3_add(mesh->vertices[v0].curvature, diff, mesh->vertices[v0].curvature);
+    }
+
+    // Scale curvature for heat map coloring
+    for (size_t i = 0; i < mesh->numVertices; i++)
+        glm_vec3_scale(mesh->vertices[i].curvature, 1000.0f, mesh->vertices[i].curvature);
 }

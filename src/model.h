@@ -93,4 +93,6 @@ void computeModelMatrix(Model *model, mat4 *dest);
  */
 void loadOBJ(const char *filename, Mesh *mesh);
 
+void initCurvature(Mesh *mesh);
+
 #endif

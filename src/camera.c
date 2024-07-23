@@ -121,11 +121,15 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 pDest, mat4 vDest)
     vec3 posDestTemp;
     glm_vec3_add(camera->position, camera->front, posDestTemp);
 
-    glm_perspective(glm_rad(camera->fov), ASPECT_RATIO, NEAR_Z, FAR_Z, projection); // fov, aspect ratio, near value, far value, destination
-    glm_lookat(camera->position,                                                    // camera position (world space)
-               posDestTemp,                                                         // direction
-               camera->up,                                                          // up
-               view);                                                               // destination
+    glm_perspective(glm_rad(camera->fov), // fov
+                    ASPECT_RATIO,         // aspect ratio
+                    NEAR_Z,               // near value
+                    FAR_Z,                // far value
+                    projection);          // destination
+    glm_lookat(camera->position,          // camera position (world space)
+               posDestTemp,               // direction
+               camera->up,                // up
+               view);                     // destination
 
     // Copy over matrices
     glm_mat4_copy(projection, pDest);
@@ -161,11 +165,15 @@ void updateRotationCamera(GLFWwindow *window, Camera *camera, Model *model, mat4
     mat4 projection; // projection matrix
     mat4 view;       // camera matrix
 
-    glm_perspective(glm_rad(camera->fov), ASPECT_RATIO, NEAR_Z, FAR_Z, projection); // fov, aspect ratio, near value, far value, destination
-    glm_lookat(camera->position,                                                    // camera position (world space)
-               model->position,                                                     // direction
-               camera->up,                                                          // up
-               view);                                                               // destination
+    glm_perspective(glm_rad(camera->fov), // fov
+                    ASPECT_RATIO,         // aspect ratio
+                    NEAR_Z,               // near value
+                    FAR_Z,                // far value
+                    projection);          // destination
+    glm_lookat(camera->position,          // camera position (world space)
+               model->position,           // direction
+               camera->up,                // up
+               view);                     // destination
 
     // Copy over matrices
     glm_mat4_copy(projection, pDest);

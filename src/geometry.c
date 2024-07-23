@@ -7,6 +7,9 @@
 #include "geometry.h"
 #include "model.h"
 
+// TODO: Implement MCF ITI method
+// TODO: add lower bound to flows?
+
 void computeGeometry(GLFWwindow *window, Model *model, GEOMETRIC_FLOW flow, bool flowing)
 {
     // Calculate change in time
@@ -66,7 +69,7 @@ void mcfVBM(Mesh *mesh, float deltaTime)
     {
         // Update positions based on curvature
         vec3 update;
-        glm_vec3_scale(mesh->vertices[i].curvature, deltaTime * 10, update);
+        glm_vec3_scale(mesh->vertices[i].curvature, deltaTime * 10.0f, update);
         glm_vec3_add(mesh->vertices[i].position, update, mesh->vertices[i].position);
 
         // Scale curvature for heat map coloring
