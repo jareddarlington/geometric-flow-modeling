@@ -3,7 +3,7 @@
 in vec3 fragNormal;
 in vec3 fragCurvature;
 
-out vec4 color;
+out vec4 color; // red : high curvature | blue : low curvature
 
 void main() {
 	float flowMagnitude = length(fragCurvature);

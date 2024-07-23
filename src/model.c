@@ -5,7 +5,6 @@
 #include "fast_obj.h"
 
 #include "model.h"
-#include "utils.h"
 
 #include <stdlib.h>
 #include <stdio.h>

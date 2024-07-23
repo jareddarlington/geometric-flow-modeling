@@ -6,8 +6,6 @@
 
 #include <cglm/cglm.h>
 
-#include "utils.h"
-
 // Vertex management settings
 #define VERTEX_LIMIT 50000
 
