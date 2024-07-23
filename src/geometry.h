@@ -9,6 +9,6 @@ typedef enum
 } GEOMETRIC_FLOW;
 
 void computeGeometry(GLFWwindow *window, Model *model, GEOMETRIC_FLOW flow, bool flowing);
-void mcfVBM(Mesh *mesh);
-void mcfITI(Mesh *mesh);
+void mcfVBM(Mesh *mesh, float deltaTime);
+void mcfITI(Mesh *mesh, float deltaTime);
 void computeNormals(Mesh *mesh);

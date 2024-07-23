@@ -7,25 +7,7 @@
 #include "geometry.h"
 #include "model.h"
 
-// TODO: fix large time steps on pause and unpause (causes instability)
-// TODO: find good dynamic curvature/color scaling method for small and large meshes
-// TODO: add comments
-
 void computeGeometry(GLFWwindow *window, Model *model, GEOMETRIC_FLOW flow, bool flowing)
-{
-    if (flowing)
-    {
-        if (flow == MCF_VBM)
-            mcfVBM(model->mesh);
-        else if (flow == MCF_ITI)
-            mcfITI(model->mesh);
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, model->mesh->VBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, model->mesh->numVertices * sizeof(Vertex), model->mesh->vertices);
-}
-
-void mcfVBM(Mesh *mesh)
 {
     // Calculate change in time
     static double lastTime = 0.0;
@@ -34,6 +16,24 @@ void mcfVBM(Mesh *mesh)
     double currentTime = glfwGetTime();
     float deltaTime = (float)(currentTime - lastTime);
 
+    // Compute flow if enabled
+    if (flowing)
+    {
+        if (flow == MCF_VBM)
+            mcfVBM(model->mesh, deltaTime);
+        else if (flow == MCF_ITI)
+            mcfITI(model->mesh, deltaTime);
+    }
+
+    // Rebind and upload new geometry
+    glBindBuffer(GL_ARRAY_BUFFER, model->mesh->VBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, model->mesh->numVertices * sizeof(Vertex), model->mesh->vertices);
+
+    lastTime = currentTime;
+}
+
+void mcfVBM(Mesh *mesh, float deltaTime)
+{
     // Reset all curvature to 0
     for (size_t i = 0; i < mesh->numVertices; i++)
         glm_vec3_zero(mesh->vertices[i].curvature);
@@ -72,16 +72,15 @@ void mcfVBM(Mesh *mesh)
         // Scale curvature for heat map coloring
         glm_vec3_scale(mesh->vertices[i].curvature, 100.0f, mesh->vertices[i].curvature);
     }
-
-    lastTime = currentTime;
 }
 
-void mcfITI(Mesh *mesh)
+void mcfITI(Mesh *mesh, float deltaTime)
 {
 }
 
 void computeNormals(Mesh *mesh)
 {
+    // Reset all normals
     for (size_t i = 0; i < mesh->numVertices; i++)
         glm_vec3_copy((vec3){0.0f, 0.0f, 0.0f}, mesh->vertices[i].normal);
 
