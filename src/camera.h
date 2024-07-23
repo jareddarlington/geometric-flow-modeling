@@ -10,20 +10,23 @@
 
 // TODO: update docs
 
-// Movement settings
-#define INIT_SPEED 5.0f    // camera movement speed
-#define MOUSE_SPEED 0.005f // turn / look speed
-#define ZOOM_SPEED 5.0f    // change of radius speed for rotate mode
-
-// Camera position settings
+// Initial settings
 #define INIT_CAMERA_POSITION \
     (vec3) { 0.0f, 0.0f, -3.0f } // camera inital position
 #define INIT_YAW 0               // camera inital yaw / horizontal angle
 #define INIT_PITCH 0             // camera inital pitch / vertical angle
 #define INIT_FOV 90              // camera init fov
 #define INIT_RADIUS 3.0f         // distance away from object in rotate mode
+#define INIT_MOVEMENT_SPEED 5.0f // initial camera movement speed
 
-// Camera settings
+// Movement settings
+#define MIN_MOVEMENT_SPEED 0.5f  // minimum camera movement speed
+#define MAX_MOVEMENT_SPEED 10.0f // maximum camera movement speed
+#define MOVEMENT_SPEED 0.1f      // camera movement speed increment
+#define MOUSE_SPEED 0.0025f      // turn / look increment
+#define ZOOM_SPEED 5.0f          // change of radius increment (rotate mode)
+
+// Other settings
 #define ASPECT_RATIO 4.0f / 3.0f // camera aspect ratio
 #define NEAR_Z 0.001f            // near value for z buffer (clipping plane)
 #define FAR_Z 100.0f             // far value for z buffer (clipping plane)

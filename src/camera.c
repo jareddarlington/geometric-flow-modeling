@@ -8,8 +8,7 @@
 
 #include <stdio.h>
 
-// TODO: Slow rotation speed
-// TODO: fix rotation height, angle, etc...
+// TODO: fix rotation height, angle, etc... (base on mesh)
 
 Camera *createCamera(GLFWwindow *window)
 {
@@ -23,7 +22,7 @@ Camera *createCamera(GLFWwindow *window)
     camera->pitch = INIT_PITCH;
     camera->fov = INIT_FOV;
     updateVectors(camera);
-    camera->speed = INIT_SPEED;
+    camera->speed = INIT_MOVEMENT_SPEED;
     return camera;
 };
 
@@ -47,12 +46,10 @@ void updateVectors(Camera *camera)
 
 void updateCamera(GLFWwindow *window, Camera *camera, mat4 pDest, mat4 vDest)
 {
-    static double lastTime = 0.0; // init time (first function call)
-
+    // Calculate change in time
+    static double lastTime = 0.0;
     if (lastTime == 0.0)
         lastTime = glfwGetTime();
-
-    // Compute time difference between current and last frame
     double currentTime = glfwGetTime();
     float deltaTime = (float)(currentTime - lastTime);
 
@@ -79,15 +76,15 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 pDest, mat4 vDest)
 
     // UP/DOWN speed change
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        camera->speed += 0.1f;
+        camera->speed += MOVEMENT_SPEED;
     else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        camera->speed -= 0.1f;
+        camera->speed -= MOVEMENT_SPEED;
 
     // Clamp speed
-    if (camera->speed > 5.0f)
-        camera->speed = 5.0f;
-    if (camera->speed < 0.5f)
-        camera->speed = 0.5f;
+    if (camera->speed > MAX_MOVEMENT_SPEED)
+        camera->speed = MAX_MOVEMENT_SPEED;
+    if (camera->speed < MIN_MOVEMENT_SPEED)
+        camera->speed = MIN_MOVEMENT_SPEED;
 
     // WASD movement
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // forward
@@ -140,27 +137,32 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 pDest, mat4 vDest)
 
 void updateRotationCamera(GLFWwindow *window, Camera *camera, Model *model, mat4 pDest, mat4 vDest)
 {
-    static float radius = INIT_RADIUS; // distance away from object
+    static float radius = INIT_RADIUS;
 
-    static double lastTime = 0.0; // init time (first function call)
-
+    // Calculate change in time
+    static double lastTime = 0.0;
     if (lastTime == 0.0)
         lastTime = glfwGetTime();
-
-    // Compute time difference between current and last frame
     double currentTime = glfwGetTime();
     float deltaTime = (float)(currentTime - lastTime);
 
-    camera->yaw = 0.0f;
+    // Stabilize camera
     camera->pitch = 0.0f;
-    glm_vec3_add(model->position, (vec3){radius * cos(glfwGetTime()), 1.0f, radius * sin(glfwGetTime())}, camera->position);
+    camera->yaw = 0.0f;
+
+    // Rotate camera
+    glm_vec3_add(model->position, (vec3){radius * cos(currentTime / 4.0f), 1.0f, radius * sin(currentTime / 4.0f)}, camera->position);
     updateVectors(camera); // compute front, right, and up
 
-    // "Zoom" movement
+    // Zoom movement
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // in
         radius -= ZOOM_SPEED * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // out
         radius += ZOOM_SPEED * deltaTime;
+
+    // Clamp zoom
+    if (radius < 0.001f)
+        radius = 0.001f;
 
     mat4 projection; // projection matrix
     mat4 view;       // camera matrix
@@ -179,5 +181,5 @@ void updateRotationCamera(GLFWwindow *window, Camera *camera, Model *model, mat4
     glm_mat4_copy(projection, pDest);
     glm_mat4_copy(view, vDest);
 
-    lastTime = currentTime; // update last time taken
+    lastTime = currentTime;
 }

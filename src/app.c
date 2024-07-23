@@ -24,12 +24,15 @@
  * Constants
  */
 
-#define TITLE "Geometric Flow Modeling" // window title
-#define DEFAULT_WIDTH 800               // default window width
-#define DEFAULT_HEIGHT 600              // default window height
-#define ANTI_ALIASING 4                 // anti-aliasing quality
-#define MAJOR_VERSION 4                 // OpenGL major version
-#define MINOR_VERION 6                  // OpenGL minor version
+#define TITLE "Geometric Flow Modeling"           // window title
+#define DEFAULT_WIDTH 800                         // default window width
+#define DEFAULT_HEIGHT 600                        // default window height
+#define ANTI_ALIASING 4                           // anti-aliasing quality
+#define MAJOR_VERSION 4                           // OpenGL major version
+#define MINOR_VERION 6                            // OpenGL minor version
+#define VERTEX_SHADER "./shaders/vertex.glsl"     // location of vertex shader
+#define FRAGMENT_SHADER "./shaders/fragment.glsl" // location of fragment shader
+#define MESH "models/voronoi_cube.obj"            // location of mesh to load
 
 /*
  * Enums
@@ -121,9 +124,9 @@ int main(void)
      */
 
     // Shaders and meshes
-    GLuint shaderProgram = createShaderProgram("./shaders/vertex.glsl", "./shaders/fragment.glsl");
+    GLuint shaderProgram = createShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
 
-    Mesh *mesh = createMesh("models/voronoi_cube.obj");
+    Mesh *mesh = createMesh(MESH);
     Model *model = createModel(mesh);
 
     // Transformations
