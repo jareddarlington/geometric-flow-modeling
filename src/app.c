@@ -27,7 +27,7 @@
 #define TITLE "Geometric Flow Modeling"           // window title
 #define DEFAULT_WIDTH 800                         // default window width
 #define DEFAULT_HEIGHT 600                        // default window height
-#define ANTI_ALIASING 4                           // anti-aliasing quality
+#define ANTI_ALIASING 8                           // anti-aliasing quality
 #define MAJOR_VERSION 4                           // OpenGL major version
 #define MINOR_VERION 6                            // OpenGL minor version
 #define VERTEX_SHADER "./shaders/vertex.glsl"     // location of vertex shader
@@ -116,8 +116,8 @@ int main(void)
     glClearColor(0.1686f, 0.1608f, 0.1686f, 1.0f); // set background colors
     glEnable(GL_DEPTH_TEST);                       // enable depth test (z-buffer)
     glDepthFunc(GL_LESS);                          // use fragment closer to the camera
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);     // enable polygon mode globally
-    // glEnable(GL_CULL_FACE); // enable face culling (skips rendering non-visible polygons)
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);     // enable polygon mode globally
+    // glEnable(GL_CULL_FACE);                        // enable face culling (skips rendering non-visible polygons)
 
     /*
      * Initialization
