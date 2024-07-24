@@ -29,7 +29,7 @@ As mentioned previously, you can test out geometric flows on any .obj file as lo
 
 Once you've exported your .obj file, place it in `./models` and replace `#define MESH` with its location at the top of `app.c`. Finally, run `make && ./bin/app.exe` in your terminal to compile and execute the program.
 
-\* Please note that this project was developed and has so far been tested exclusively on Windows. You may need to make some tweaks to run it on your operating system, though it should theoretically work fine. Also, the makefile is currently using GCC, so make sure the change that if you prefer a different compiler.
+\* Please note that this project was developed and has so far been tested exclusively on Windows. You may need to make some tweaks to run it on your operating system, though it should theoretically work fine. Also, the makefile is currently using GCC, so make sure to change that if you prefer a different compiler.
 
 ## Libraries and APIs.
 
