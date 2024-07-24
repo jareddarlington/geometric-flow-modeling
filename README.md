@@ -9,7 +9,7 @@ Implementation and visualization of various discrete geometric flow algorithms f
 ## Features.
 
 -   [Mean curvature flow](https://en.wikipedia.org/wiki/Mean_curvature_flow): this geometric flow evolves a manifold over time based on its mean curvature, or in our case, a mesh in the direction of its discrete analogue of mean curvature. This flow is used in surface smoothing and topology optimization, among other applications.
--   Camera modes--free, [rotate](#example-of-rotational-camera-on-voronoi-sphere), and lock--enable users to navigate space with keyboard and mouse, automatically rotate around objects for cinematic angles, or lock their position for stable shots.
+-   Camera modes--free, [rotate](#example-of-rotational-camera-around-voronoi-sphere), and lock--enable users to navigate space with keyboard and mouse, automatically rotate around objects for cinematic angles, or lock their position for stable shots.
 -   [Heat mapping](#example-of-heat-mapping-on-hand-mesh) is used to represent curvature and flow intensity, as well as provide pretty visuals. Red represents higher curvature, and blue represents lower curvature.
 -   Object loading: allows users to compute geometric flows on any .obj file. See how [here](#usage).
 
@@ -29,7 +29,7 @@ As mentioned previously, you can test out geometric flows on any .obj file as lo
 
 Once you've exported your .obj file, place it in `./models` and replace `#define MESH` with its location at the top of `app.c`. Finally, run `make && ./bin/app.exe` in your terminal to compile and execute the program.
 
-\* Please note that this program was developed and has so far been tested exclusively on Windows. You may need to make some tweaks to run it on your operating system, though it should theoretically work fine.
+\* Please note that this project was developed and has so far been tested exclusively on Windows. You may need to make some tweaks to run it on your operating system, though it should theoretically work fine. Also, the makefile is currently using GCC, so make sure the change that if you prefer a different compiler.
 
 ## Libraries and APIs.
 
