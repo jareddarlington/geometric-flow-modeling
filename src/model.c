@@ -14,6 +14,7 @@
 #include <cglm/cglm.h>
 
 // TODO: Refactor and comment / document
+// TODO: Make initCurvature more accurate
 
 Model *createModel(Mesh *mesh)
 {
