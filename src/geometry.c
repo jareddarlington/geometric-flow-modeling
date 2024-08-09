@@ -1,14 +1,15 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include <cglm/cglm.h>
-#include <math.h>
-
 #include "geometry.h"
 #include "model.h"
 
+#include <cglm/cglm.h>
+
+#include <math.h>
+
 // TODO: Implement MCF ITI method
-// TODO: add lower bound to flows?
+// TODO: Add lower bound to flows (maybe)
 
 void computeGeometry(GLFWwindow *window, Model *model, GEOMETRIC_FLOW flow, bool flowing)
 {
@@ -32,12 +33,12 @@ void computeGeometry(GLFWwindow *window, Model *model, GEOMETRIC_FLOW flow, bool
     glBindBuffer(GL_ARRAY_BUFFER, model->mesh->VBO);
     glBufferSubData(GL_ARRAY_BUFFER, 0, model->mesh->numVertices * sizeof(Vertex), model->mesh->vertices);
 
-    lastTime = currentTime;
+    lastTime = currentTime; // update time
 }
 
 void mcfVBM(Mesh *mesh, float deltaTime)
 {
-    // Reset all curvature to 0
+    // Reset all curvature
     for (size_t i = 0; i < mesh->numVertices; i++)
         glm_vec3_zero(mesh->vertices[i].curvature);
 

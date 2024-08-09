@@ -8,14 +8,17 @@
 
 #include <stdio.h>
 
-// TODO: fix rotation height, angle, etc... (base on mesh)
+// TODO: Set rotation height, angle, etc to be based on model
+// TODO: Fix issue with camera turning away from object while swapping camera modes
 
 Camera *createCamera(GLFWwindow *window)
 {
+    // Grab init window info
     int winWidth, winHeight;
     glfwGetWindowSize(window, &winWidth, &winHeight);
     glfwSetCursorPos(window, winWidth / 2, winHeight / 2);
 
+    // Malloc and set defaults
     Camera *camera = malloc(sizeof(Camera));
     glm_vec3_copy(INIT_CAMERA_POSITION, camera->position);
     camera->yaw = INIT_YAW;
@@ -23,6 +26,7 @@ Camera *createCamera(GLFWwindow *window)
     camera->fov = INIT_FOV;
     updateVectors(camera);
     camera->speed = INIT_MOVEMENT_SPEED;
+
     return camera;
 };
 
@@ -87,34 +91,29 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 pDest, mat4 vDest)
         camera->speed = MIN_MOVEMENT_SPEED;
 
     // WASD movement
+    vec3 temp;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // forward
     {
-        vec3 temp;
         glm_vec3_scale(camera->front, deltaTime * camera->speed, temp);
         glm_vec3_add(camera->position, temp, camera->position);
     }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // back
+    else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // back
     {
-        vec3 temp;
         glm_vec3_scale(camera->front, deltaTime * camera->speed, temp);
         glm_vec3_sub(camera->position, temp, camera->position);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) // right
     {
-        vec3 temp;
         glm_vec3_scale(camera->right, deltaTime * camera->speed, temp);
         glm_vec3_add(camera->position, temp, camera->position);
     }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // left
+    else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // left
     {
-        vec3 temp;
         glm_vec3_scale(camera->right, deltaTime * camera->speed, temp);
         glm_vec3_sub(camera->position, temp, camera->position);
     }
 
-    mat4 projection; // projection matrix
-    mat4 view;       // camera matrix
-
+    mat4 projection, view; // projection matrix, camera matrix
     vec3 posDestTemp;
     glm_vec3_add(camera->position, camera->front, posDestTemp);
 
@@ -137,7 +136,7 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 pDest, mat4 vDest)
 
 void updateRotationCamera(GLFWwindow *window, Camera *camera, Model *model, mat4 pDest, mat4 vDest)
 {
-    static float radius = INIT_RADIUS;
+    static float radius = INIT_RADIUS; // init radius
 
     // Calculate change in time
     static double lastTime = 0.0;
@@ -164,8 +163,7 @@ void updateRotationCamera(GLFWwindow *window, Camera *camera, Model *model, mat4
     if (radius < 0.001f)
         radius = 0.001f;
 
-    mat4 projection; // projection matrix
-    mat4 view;       // camera matrix
+    mat4 projection, view; // projection matrix, camera matrix
 
     glm_perspective(glm_rad(camera->fov), // fov
                     ASPECT_RATIO,         // aspect ratio

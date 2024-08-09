@@ -6,14 +6,13 @@
 
 #include "model.h"
 
+#include <cglm/cglm.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stddef.h>
 #include <string.h>
 
-#include <cglm/cglm.h>
-
-// TODO: Refactor and comment / document
 // TODO: Make initCurvature more accurate
 
 Model *createModel(Mesh *mesh)
@@ -24,6 +23,7 @@ Model *createModel(Mesh *mesh)
     glm_vec3_copy(INIT_ROTATION, model->rotation);       // set rotation
     glm_vec3_copy(INIT_SCALE, model->scale);             // set scale
     model->renderMethod = GL_TRIANGLES;                  // set render method
+
     return model;
 }
 
@@ -68,9 +68,12 @@ Mesh *createMesh(const char *filename)
 
 void destroyMesh(Mesh *mesh)
 {
+    // Delete buffers
     glDeleteVertexArrays(1, &(mesh->VAO));
     glDeleteBuffers(1, &(mesh->VBO));
     glDeleteBuffers(1, &(mesh->IBO));
+
+    // Free memory
     free(mesh->vertices);
     free(mesh->indices);
     free(mesh);
@@ -92,11 +95,13 @@ void computeModelMatrix(Model *model, mat4 *dest)
     // Scaling
     glm_scale(modelMatrix, model->scale);
 
-    glm_mat4_copy(modelMatrix, *dest); // copy over computed vp
+    // Copy over model matrix
+    glm_mat4_copy(modelMatrix, *dest);
 }
 
 void loadOBJ(const char *filename, Mesh *mesh)
 {
+    // Load OBJ
     fastObjMesh *obj = fast_obj_read(filename);
     if (!obj)
     {
@@ -104,14 +109,15 @@ void loadOBJ(const char *filename, Mesh *mesh)
         exit(EXIT_FAILURE);
     }
 
+    // Grab geometry stats
     mesh->numVertices = obj->position_count;
     mesh->numIndices = obj->face_count * 3;
 
-    // Allocate memory for vertices and normals
+    // Allocate memory
     mesh->vertices = malloc(mesh->numVertices * sizeof(Vertex));
     mesh->indices = malloc(mesh->numIndices * sizeof(uint32_t));
 
-    // Copy vertices and normals
+    // Copy vertices
     for (unsigned int i = 0; i < obj->position_count; ++i)
     {
         mesh->vertices[i].position[0] = obj->positions[3 * i + 0];

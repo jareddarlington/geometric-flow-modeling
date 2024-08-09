@@ -18,22 +18,22 @@
     (vec3) { 1.0f, 1.0f, 1.0f }
 
 /*
- * Structures
+ * Structs
  */
 
 typedef struct
 {
     vec3 position;  // vertex's position
     vec3 normal;    // vertex's normal
-    vec3 curvature; // discrete analogue to curvature or vector of flow movement
+    vec3 curvature; // discrete analogue to curvature (or sometimes vector of flow movement)
 } Vertex;
 
 typedef struct
 {
-    Vertex *vertices;
-    uint32_t *indices;
-    GLuint VAO, VBO, IBO;
-    size_t numIndices, numVertices;
+    Vertex *vertices;               // vertices of obj
+    uint32_t *indices;              // indices of vertices
+    GLuint VAO, VBO, IBO;           // buffers
+    size_t numIndices, numVertices; // geometry stats
 } Mesh;
 
 typedef struct
@@ -53,6 +53,7 @@ typedef struct
  * @brief Creates model and sets defaults.
  *
  * @param mesh Model's mesh.
+ * @return Initialized model.
  */
 Model *createModel(Mesh *mesh);
 
@@ -67,6 +68,7 @@ void destroyModel(Model *model);
  * @brief Creates mesh and binds buffers.
  *
  * @param filename .obj filename.
+ * @return Initialized mesh.
  */
 Mesh *createMesh(const char *filename);
 
@@ -93,6 +95,11 @@ void computeModelMatrix(Model *model, mat4 *dest);
  */
 void loadOBJ(const char *filename, Mesh *mesh);
 
+/**
+ * @brief Initializes curvature of mesh.
+ *
+ * @param mesh Mesh to initialized curvature of.
+ */
 void initCurvature(Mesh *mesh);
 
 #endif

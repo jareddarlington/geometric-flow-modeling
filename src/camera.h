@@ -8,8 +8,6 @@
 
 #include <cglm/cglm.h>
 
-// TODO: update docs
-
 // Initial settings
 #define INIT_CAMERA_POSITION \
     (vec3) { 0.0f, 0.0f, -3.0f } // camera inital position
@@ -30,6 +28,10 @@
 #define ASPECT_RATIO 4.0f / 3.0f // camera aspect ratio
 #define NEAR_Z 0.001f            // near value for z buffer (clipping plane)
 #define FAR_Z 100.0f             // far value for z buffer (clipping plane)
+
+/*
+ * Structs
+ */
 
 /**
  * @brief Holds camera information.
@@ -54,6 +56,7 @@ typedef struct
  * @brief Initializes camera object.
  *
  * @param window GLFW window.
+ * @return Initialized camera object.
  */
 Camera *createCamera(GLFWwindow *window);
 
@@ -69,7 +72,8 @@ void updateVectors(Camera *camera);
  *
  * @param window GLFW window.
  * @param camera Camera to update and read from.
- * @param vp     VP matrix to update.
+ * @param pDest  Mat4 to output projection matrix to.
+ * @param vDest  Mat4 to ouput view matrix to.
  */
 void updateCamera(GLFWwindow *window, Camera *camera, mat4 pDest, mat4 vDest);
 
@@ -78,8 +82,9 @@ void updateCamera(GLFWwindow *window, Camera *camera, mat4 pDest, mat4 vDest);
  *
  * @param window GLFW window.
  * @param camera Camera to update and read from.
- * @param vp     VP matrix to update.
  * @param model  Model to rotate around.
+ * @param pDest  Mat4 to output projection matrix to.
+ * @param vDest  Mat4 to ouput view matrix to.
  */
 void updateRotationCamera(GLFWwindow *window, Camera *camera, Model *model, mat4 pDest, mat4 vDest);
 

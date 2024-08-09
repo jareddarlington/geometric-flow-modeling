@@ -15,10 +15,6 @@
 #include <stddef.h>
 #include <stdio.h>
 
-// TODO: Fix camera turning away from object while going from rotate mode to free mode
-// TODO: Add options to export shapes
-// TODO: Add grid
-
 /*
  * Constants
  */
@@ -31,7 +27,7 @@
 #define MINOR_VERION 6                            // OpenGL minor version
 #define VERTEX_SHADER "./shaders/vertex.glsl"     // location of vertex shader
 #define FRAGMENT_SHADER "./shaders/fragment.glsl" // location of fragment shader
-#define MESH "models/voronoi_cube.obj"            // location of mesh to load
+#define MESH "models/voronoi_cube.obj"            // location of mesh to load (REPLACE FILENAME HERE)
 
 /*
  * Enums
@@ -58,7 +54,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
 CAMERA_MODE cMode = FREE;      // initial camera mode
 GEOMETRIC_FLOW flow = MCF_VBM; // geometric flow to compute
-bool flowing = false;
+bool flowing = false;          // flow pause state
 
 int main(void)
 {
@@ -66,8 +62,7 @@ int main(void)
      * GLFW Setup
      */
 
-    // Set GLFW error callback
-    glfwSetErrorCallback(error_callback);
+    glfwSetErrorCallback(error_callback); // set GLFW error callback
 
     // Initialize GLFW
     if (!glfwInit())
@@ -124,7 +119,6 @@ int main(void)
 
     // Shaders and meshes
     GLuint shaderProgram = createShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
-
     Mesh *mesh = createMesh(MESH);
     Model *model = createModel(mesh);
 
@@ -175,6 +169,7 @@ int main(void)
         glfwPollEvents();
     }
 
+    // Exit
     destroyModel(model);
     glfwTerminate();
     exit(EXIT_SUCCESS);
@@ -205,6 +200,9 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) // close on escape
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 
+    if (key == GLFW_KEY_F && action == GLFW_PRESS) // pause/unpause flow
+        flowing = !flowing;
+
     if (key == GLFW_KEY_C && action == GLFW_PRESS) // turn camera mode on/off
     {
         switch (cMode)
@@ -223,8 +221,6 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
             break;
         }
     }
-    if (key == GLFW_KEY_F && action == GLFW_PRESS)
-        flowing = !flowing;
 }
 
 /**
