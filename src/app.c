@@ -15,6 +15,8 @@
 #include <stddef.h>
 #include <stdio.h>
 
+// TODO: Add window icon
+
 /*
  * Constants
  */
