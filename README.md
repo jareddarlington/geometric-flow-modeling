@@ -4,7 +4,7 @@
 
 ## Overview.
 
-Implementation and visualization of various discrete geometric flow algorithms from the field of [differential geometry](https://en.wikipedia.org/wiki/Differential_geometry). Written in C, using [OpenGL 4.6](https://www.khronos.org/about/), for high-performance rendering.
+Implementation and visualization of a few discrete geometric flow algorithms from the field of [differential geometry](https://en.wikipedia.org/wiki/Differential_geometry). Written in C, using [OpenGL 4.6](https://www.khronos.org/about/), for high-performance rendering.
 
 ## Features.
 
